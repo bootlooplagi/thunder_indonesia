@@ -545,11 +545,11 @@
                                           <?php }?>
                                           
                                         </tbody>
-                                        <tfoot style="font-size:11px;">
+                                        <tfoot style="font-size:11px;" id="tf_sel">
                                           <tr style="background-color: grey; color: white;">
-                                            <td>
-                                            	<input type="checkbox" value="false">&nbsp;
-                                            </td>
+                                            <th>
+                                            	<div class="btn btn-warning" onclick="hideForm(true)"><span class="fa fa-refresh"></span></div>
+                                            </th>
 
                                             <td colspan="2">
                                               
@@ -602,8 +602,25 @@
                                             <td style="display: none"></td>
                                             <td style="display: none"></td>
                                           </tr>
+                                        </tfoot>
+                                        <tfoot id="tf_free" style="display: none;">
+                                          <tr style="background-color: grey; color: white;">
+                                            <th>
+                                              <div class="btn btn-warning" onclick="hideForm(true)"><span class="fa fa-refresh"></span></div>
+                                            </th>
 
-                                          
+                                            <td colspan="12">
+                                              <div id="frmFree">
+                                                <input id="frBarcode" type="number" class="form-control" placeholder="Barcode">
+                                                <input id="frNamaBarang" type="text" class="form-control" placeholder="Nama Brg">
+                                                <input id="frQty" type="number" class="form-control" placeholder="Qty" style="width: 100px;">
+                                                <input id="frHarga" type="number" class="form-control" placeholder="Harga">
+                                                <input id="frDiscount" type="number" class="form-control" placeholder="Discount" style="width: 100px;">
+                                                <input id="frDurasi" type="number" class="form-control" placeholder="Durasi">
+                                                <button onclick="add_item_free();" type="button" class="btn btn-success btn-sm" data-toggle="tooltip" title="Add Item"><span class="glyphicon glyphicon-plus"></span></button>
+                                              </div>
+                                            </td>
+                                          </tr>
                                         </tfoot>
                                     </table>
                                   </div>

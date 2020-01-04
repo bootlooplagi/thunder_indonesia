@@ -2,6 +2,33 @@ var tmpItem = [];
 var qtyItem = [];
 var del_date_server = [];
 
+// var tmpH = '';
+
+function hideForm(x){
+	if($('#tf_free').is(':visible')===true){
+		$('#tf_free').hide();
+		$('#tf_sel').show();
+	}else{
+		$('#tf_free').show();
+		$('#tf_sel').hide();
+	}
+
+	
+	// let frm = $(x).prop('checked');
+	
+	// if(frm===true){
+		
+	// 	$('#tf_free').show();
+	// 	$('#tf_sel').hide();
+	// 	$(x).prop('checked',true);
+	// }else{
+		
+	// 	$('#tf_sel').show();
+	// 	$('#tf_free').hide();
+	// 	$(x).prop('checked',false);
+	// }
+};
+
 $('.dt_picker').datetimepicker({
         // inline: true,
         // sideBySide: true,
@@ -36,8 +63,7 @@ var DataTableItem = $('#tb_item_pemesanan').DataTable({
 				            className: 'control',
 				            orderable: false,
 				            targets:   -1
-				        } ],
-				        order: [ 0, 'asc' ]
+				        } ]
 				    });
 $(function() {
 	// alert(jenis);
@@ -227,9 +253,7 @@ function add_item() {
 							// DataTableItem;
 							// DataTableItem.row.node();
 							DataTableItem.row.add([
-													`<input type="hidden" class="id_item" value="` + item_val[0] + `">
-													<input type="hidden" class="id_it_pemesanan">
-													<p class="no_item"></p>`,
+													`<input type="hidden" class="id_item" value="` + item_val[0] + `"><input type="hidden" class="id_it_pemesanan"><p class="no_item"></p>`,
 													item_val[1],
 													item_val[2],
 													item_val[4],
@@ -282,6 +306,34 @@ function add_item() {
  //        } ],
  //        order: [ 0, 'asc' ]
  //    });
+}
+
+function add_item_free(){
+	// $.each($('#tb_item_pemesanan tbody tr'), function(index, val) {
+	// 	console.log($.parseHTML(DataTableItem.cell(index,0).data())[0].value);
+	// });
+	var freeF = $('#frmFree');
+	DataTableItem.row.add([
+		`<input type="hidden" class="id_item" value="FREE">
+		<input type="hidden" class="id_it_pemesanan">
+		<p class="no_item"></p>`,
+		freeF.find('#frBarcode').val(),
+		freeF.find('#frNamaBarang').val(),
+		'ITEM BEBAS',
+		'-',
+		freeF.find('#frQty').val(),
+		freeF.find('#frHarga').val(),
+		parseInt(freeF.find('#frQty').val())*parseInt(freeF.find('#frHarga').val()),
+		freeF.find('#frDiscount').val(),
+		'-',
+		freeF.find('#frDurasi').val(),
+		(parseInt(freeF.find('#frQty').val())*parseInt(freeF.find('#frHarga').val()))-((parseInt(freeF.find('#frQty').val())*parseInt(freeF.find('#frHarga').val()))*(parseInt(freeF.find('#frDiscount').val())/100)),
+		`<button onclick="del_item($(this))" type="button" class="btn btn-danger btn-xs" data-toggle="tooltip" title="Delete">
+			<span class="glyphicon glyphicon-trash"></span>
+		</button>`,
+		'',
+		'item_durasi[0]'
+	]).draw(false);
 }
 
 
@@ -363,6 +415,7 @@ function submit(x,type=null) {
 		var tmpIt = [];
 		var itemSuccess = [];
 		var itemError = [];
+		var tmpFree = [];
 
 		var valid_submit = validate('req-s-pem');
 
@@ -372,8 +425,22 @@ function submit(x,type=null) {
 
 			if(c_item>0){
 				$.each($('#tb_item_pemesanan tbody tr'), function(index, val) {
-
-
+						
+					if($.parseHTML(DataTableItem.cell(index,0).data())[0].value=='FREE'){
+						// tmpFree.push({
+						// 	barcode:DataTableItem.cell(index,1).data(),
+						// 	name:parseInt(DataTableItem.cell(index,2).data()),
+						// 	// stock:parseInt(DataTableItem.cell(index,4).data()),
+						// 	qty:parseInt(DataTableItem.cell(index,5).data()),
+						// 	harga:parseInt(DataTableItem.cell(index,6).data())
+						// 	jenis_item:'FREE',
+						// 	disc:parseInt(DataTableItem.cell(index,8).data()),
+						// 	is_free:1
+						// 	// extra_charge:parseInt(DataTableItem.cell(index,9).data()),
+						// 	// sub:parseInt(DataTableItem.cell(index,6).data()),
+						// 	// durasi:DataTableItem.cell(index,14).data()
+						// });
+					}else{
 						tmpIt.push({
 							barcode:DataTableItem.cell(index,1).data(),
 							name:parseInt(DataTableItem.cell(index,2).data()),
@@ -423,6 +490,7 @@ function submit(x,type=null) {
 								durasi:parseInt(DataTableItem.cell(index,14).data())
 							});
 						}
+					}
 				});
 			}
 
@@ -459,45 +527,70 @@ function submit(x,type=null) {
 						var nomor = $('#no_pemesanan').html();
 						var items = [];
 						try {
-							$.each($('.id_item'), function(index, val) {
+							$.each(DataTableItem.rows().data(),function(index,val){
+							// $.each($('.id_item'), function(index, val) {
+								// if($.parseHTML(DataTableItem.cell(index,0).data())[0].value=='FREE'){
+								
 
-								var id_i = $('.id_item').eq(index).val();
-								var id_ip = $('.id_it_pemesanan').eq(index).val();
+								var id_i = $.parseHTML(DataTableItem.cell(index,0).data())[0].value;//$('.id_item').eq(index).val();
+								var id_ip = $.parseHTML(DataTableItem.cell(index,0).data())[1].value;//$('.id_it_pemesanan').eq(index).val();
 								// var qty_i = $('.id_item').eq(index).parents('tbody tr').find('td:eq(5)').html();
 								// var h_stock_i = $('.id_item').eq(index).parents('tbody tr').find('td:eq(4)').html();
 								// var disc = $('.id_item').eq(index).parents('tbody tr').find('td:eq(8)').html();
 								// var extra_charge = $('.id_item').eq(index).parents('tbody tr').find('td:eq(9)').html();
 								// var sub = $('.id_item').eq(index).parents('tbody tr').find('td:eq(6)').html();
 
-								var qty_i = DataTableItem.cell(index,5).data();
-								var h_stock_i = DataTableItem.cell(index,4).data();
-								var disc = DataTableItem.cell(index,8).data();
-								var extra_charge = DataTableItem.cell(index,9).data();
-								var sub = DataTableItem.cell(index,6).data();
-								var net = clear_f_cur(DataTableItem.cell(index,11).data());
-								var durasi_id = DataTableItem.cell(index,14).data();
+								if(id_i=='FREE'){
+									
+									tmpFree.push({
+										barcode:DataTableItem.cell(index,1).data(),
+										name:DataTableItem.cell(index,2).data(),
+										// stock:parseInt(DataTableItem.cell(index,4).data()),
+										qty:parseInt(DataTableItem.cell(index,5).data()),
+										harga:parseInt(DataTableItem.cell(index,6).data()),
+										// jenis_item:'FREE',
+										disc:parseInt(DataTableItem.cell(index,8).data()),
+										is_free:1
+										// extra_charge:parseInt(DataTableItem.cell(index,9).data()),
+										// sub:parseInt(DataTableItem.cell(index,6).data()),
+										// durasi:DataTableItem.cell(index,14).data()
+									});
+									// console.log(tmpFree);
+									// console.log(items);
+								}else{
+									
+									var qty_i = DataTableItem.cell(index,5).data();
+									var h_stock_i = DataTableItem.cell(index,4).data();
+									var disc = DataTableItem.cell(index,8).data();
+									var extra_charge = DataTableItem.cell(index,9).data();
+									var sub = DataTableItem.cell(index,6).data();
+									var net = clear_f_cur(DataTableItem.cell(index,11).data());
+									var durasi_id = DataTableItem.cell(index,14).data();
 
 
-								// alert(qty_i);
-								// alert(id_i);
-								// alert(id_ip);
-								// alert(qty_i);
-								// alert(h_stock_i);
-								// alert(disc);
-								// alert(extra_charge);
-								// alert(sub);
+									// alert(qty_i);
+									// alert(id_i);
+									// alert(id_ip);
+									// alert(qty_i);
+									// alert(h_stock_i);
+									// alert(disc);
+									// alert(extra_charge);
+									// alert(sub);
 
-								items.push({
-									'id': id_ip,
-									'id_item': id_i,
-									'qty': qty_i,
-									'h_stock': h_stock_i,
-									'disc': disc,
-									'extra_charge': extra_charge,
-									'harga': clear_f_cur(sub),
-									'total_harga':clear_f_cur(net),
-									'durasi':clear_f_cur(durasi_id)
-								});
+									items.push({
+										'id': id_ip,
+										'id_item': id_i,
+										'qty': qty_i,
+										'h_stock': h_stock_i,
+										'disc': disc,
+										'extra_charge': extra_charge,
+										'harga': clear_f_cur(sub),
+										'total_harga':clear_f_cur(net),
+										'durasi':clear_f_cur(durasi_id)
+									});
+
+
+								}
 
 							});
 						} catch (e) {
@@ -552,6 +645,7 @@ function submit(x,type=null) {
 								// duration:duration,
 								nomor: nomor,
 								item: items,
+								itemFree: tmpFree,
 								list_del:list_del,
 								kirim:send,
 								ls_tgl_acara:tgl_acara,
@@ -633,6 +727,8 @@ function del_item(x) {
 			$('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(0) p.no_item').html(index + 1);
 		});
 	}
+
+	console.log(DataTableItem.rows().data());
 }
 
 var list_del = [];
