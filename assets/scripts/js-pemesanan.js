@@ -440,6 +440,22 @@ function submit(x,type=null) {
 						// 	// sub:parseInt(DataTableItem.cell(index,6).data()),
 						// 	// durasi:DataTableItem.cell(index,14).data()
 						// });
+						tmpFree.push({
+							barcode:DataTableItem.cell(index,1).data(),
+							name:DataTableItem.cell(index,2).data(),
+							// stock:parseInt(DataTableItem.cell(index,4).data()),
+							qty:parseInt(DataTableItem.cell(index,5).data()),
+							harga:parseInt(DataTableItem.cell(index,6).data()),
+							// jenis_item:'FREE',
+							disc:parseInt(DataTableItem.cell(index,8).data()),
+							is_free:1
+							// extra_charge:parseInt(DataTableItem.cell(index,9).data()),
+							// sub:parseInt(DataTableItem.cell(index,6).data()),
+							// durasi:DataTableItem.cell(index,14).data()
+						});
+						// console.log(tmpFree);
+						// console.log(items);
+									
 					}else{
 						tmpIt.push({
 							barcode:DataTableItem.cell(index,1).data(),
@@ -542,21 +558,7 @@ function submit(x,type=null) {
 
 								if(id_i=='FREE'){
 									
-									tmpFree.push({
-										barcode:DataTableItem.cell(index,1).data(),
-										name:DataTableItem.cell(index,2).data(),
-										// stock:parseInt(DataTableItem.cell(index,4).data()),
-										qty:parseInt(DataTableItem.cell(index,5).data()),
-										harga:parseInt(DataTableItem.cell(index,6).data()),
-										// jenis_item:'FREE',
-										disc:parseInt(DataTableItem.cell(index,8).data()),
-										is_free:1
-										// extra_charge:parseInt(DataTableItem.cell(index,9).data()),
-										// sub:parseInt(DataTableItem.cell(index,6).data()),
-										// durasi:DataTableItem.cell(index,14).data()
-									});
-									// console.log(tmpFree);
-									// console.log(items);
+									
 								}else{
 									
 									var qty_i = DataTableItem.cell(index,5).data();
@@ -705,7 +707,8 @@ function submit(x,type=null) {
 					}
 				}
 
-				if(tmpIt<1){
+				if(tmpIt<1 && tmpFree<1){
+					console.log(tmpFree);
 					$.alert('Item Pemesanan Kosong');
 				}else{
 					if(tmpIt.length==itemSuccess.length){
