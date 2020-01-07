@@ -455,7 +455,7 @@ function submit(x,type=null) {
 						});
 						// console.log(tmpFree);
 						// console.log(items);
-									
+
 					}else{
 						tmpIt.push({
 							barcode:DataTableItem.cell(index,1).data(),
