@@ -448,10 +448,10 @@ function submit(x,type=null) {
 							harga:parseInt(DataTableItem.cell(index,6).data()),
 							// jenis_item:'FREE',
 							disc:parseInt(DataTableItem.cell(index,8).data()),
-							is_free:1
+							is_free:1,
 							// extra_charge:parseInt(DataTableItem.cell(index,9).data()),
 							// sub:parseInt(DataTableItem.cell(index,6).data()),
-							// durasi:DataTableItem.cell(index,14).data()
+							durasi:DataTableItem.cell(index,10).data()
 						});
 						// console.log(tmpFree);
 						// console.log(items);

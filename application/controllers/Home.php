@@ -6,6 +6,8 @@ class home extends CI_Controller {
 	function __construct(){
 		parent::__construct();
 
+		date_default_timezone_set('Asia/Jakarta');
+
 	}
 
 	/**
@@ -104,6 +106,114 @@ class home extends CI_Controller {
 	public function logout(){
 		session_destroy();
 		redirect('login');
+	}
+
+	public function gen_ex(){
+		/** Error reporting */
+		error_reporting(E_ALL);
+		ini_set('display_errors', TRUE);
+		ini_set('display_startup_errors', TRUE);
+
+		define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
+
+		date_default_timezone_set('Europe/London');
+
+
+		include_once APPPATH.'/third_party/excel/PHPExcel/IOFactory.php';
+
+
+
+
+		
+		$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+		
+		$objPHPExcel = $objReader->load(APPPATH.'/third_party/excel/TEMPLATE_PENAWARAN.xlsx');
+
+
+		$styleArray = array(
+			    'font'  => array(
+			        'bold'  => true,
+			        'color' => array(
+			        				'rgb' => '000000'
+			        			)
+			    	)
+			);
+
+			$styleArray1 = array(
+			    'font'  => array(
+			        'color' => array(
+			        				'rgb' => '000000'
+			        			)
+			    	),
+			    'borders' => array(
+				   'outline' => array(
+				      'style' => PHPExcel_Style_Border::BORDER_NONE
+				   ),
+				)
+		);
+
+		$objPHPExcel->setActiveSheetIndex(0)->mergeCells('E10:G10');
+		$objPHPExcel->getActiveSheet()->setCellValue('E10',$list[0]->nama_pemesan);
+
+		$objPHPExcel->setActiveSheetIndex(0)->mergeCells('E11:G11');
+		$objPHPExcel->getActiveSheet()->setCellValue('E11',$list[0]->nama_perusahaan);
+
+
+		$objPHPExcel->setActiveSheetIndex(0)->mergeCells('E13:G13');
+		$objPHPExcel->getActiveSheet()->setCellValue('E13',$list[0]->fax);
+
+		$baseRow = 17;
+		$total_all = 0;
+		$keyRow = $baseRow;
+
+		foreach($list as $key => $value) {
+			$row = $baseRow + $key;
+			$total_all += $value->harga_akhir;
+			
+			// echo $row;
+			$objPHPExcel->getActiveSheet()->insertNewRowBefore($row,1);
+			$objPHPExcel->setActiveSheetIndex(0)->mergeCells('D'.$row.':'.'E'.$row);
+			$objPHPExcel->setActiveSheetIndex(0)->mergeCells('F'.$row.':'.'I'.$row);
+
+			$objPHPExcel->getActiveSheet()->setCellValue('C'.$row,$value->qty)
+			                              ->setCellValue('D'.$row,$value->satuan)
+			                              ->setCellValue('F'.$row,$value->item_name.' - ('.$value->name_durasi.')')
+			                              ->setCellValue('J'.$row,$value->harga)
+			                              ->setCellValue('K'.$row,$value->harga_akhir);
+
+			
+			        // 'size'  => 12,
+			        // 'name'  => 'Verdana'
+			    
+
+			// $phpExcel->getActiveSheet()->getCell('A1')->setValue('Some text');
+			$objPHPExcel->getActiveSheet()->getStyle('F'.$row)->applyFromArray($styleArray1);
+			$objPHPExcel->getActiveSheet()->getStyle('J'.$row)->applyFromArray($styleArray);
+			$objPHPExcel->getActiveSheet()->getStyle('K'.$row)->applyFromArray($styleArray);
+			                              // ->setCellValue('C'.$row, $dataRow['price'])
+			                              // ->setCellValue('D'.$row, $dataRow['quantity'])
+			                              // ->setCellValue('E'.$row, '=C'.$row.'*D'.$row);
+			$keyRow++;
+		}
+
+		$objPHPExcel->getActiveSheet()->insertNewRowBefore($keyRow,1);
+		$objPHPExcel->setActiveSheetIndex(0)->mergeCells('D'.$keyRow.':'.'E'.$keyRow);
+		$objPHPExcel->setActiveSheetIndex(0)->mergeCells('F'.$keyRow.':'.'I'.$keyRow);
+		$keyRow++;
+
+		$objPHPExcel->setActiveSheetIndex(0)->mergeCells('J'.$keyRow.':'.'K'.$keyRow);
+		$objPHPExcel->getActiveSheet()->setCellValue('J'.$keyRow,$total_all);
+
+		$r_terbilang = $keyRow+8;
+		$this->load->library('tambahan');
+		
+		$objPHPExcel->setActiveSheetIndex(0)->mergeCells('F'.$r_terbilang.':'.'K'.$r_terbilang);
+		$objPHPExcel->getActiveSheet()->setCellValue('F'.$r_terbilang,$this->tambahan->terbilang($total_all).' Rupiah');
+
+
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		$file = APPPATH.'../assets/doc_penawaran/'.$type.'_'.$list[0]->no_pemesanan.'_'.date('Y-m-d H_i_s').'.xlsx';
+		$objWriter->save(str_replace('.php', '.xlsx', $file));
 	}
 
 	

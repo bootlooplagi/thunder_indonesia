@@ -620,18 +620,19 @@ class Model_transaksi extends CI_Model {
 												ip.disc,
 												ifnull(ip.extra_charge,0) as extra_charge,
 												ip.`total_harga` as harga_akhir,
-												(select name from durasi where id=ip.durasi) as name_durasi,
+												ifnull((select name from durasi where id=ip.durasi),concat(durasi," Hari")) as name_durasi,
 												(select (
 													(ip.harga*ip.qty)-
 													((ip.harga*ip.qty)*(ip.disc/100))+
-													((ip.harga*ip.qty)*(ip.`extra_charge`/100))
+													((ip.harga*ip.qty)*(IFNULL(ip.extra_charge,0)/100))
 												)) as total_harga,
 												if(ip.is_out=1,"checked","") as is_out,
 												ip.out_remark,
 												ip.in_remark,
 												if(ip.is_in=1,"checked","") as is_in,
 												ip.in_date,
-												ip.out_date
+												ip.out_date,
+												ip.is_free
 
 									from pemesanan as p
 											join item_pemesanan as ip

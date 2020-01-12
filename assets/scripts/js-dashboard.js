@@ -131,10 +131,10 @@ function sh_pemesanan(x, y = null) {
 						<td>` + res[index].name_durasi + `</td>
 						<td class="t_right">` + f_cur(res[index].harga) + `</td>
 						<td class="t_right">` + f_cur(parseInt(res[index].total_harga)) + `</td>
-						<td class="t_right">` + f_cur(parseInt(res[index].harga_akhir)) + `</td>
+						<td class="t_right">` + f_cur(parseInt(res[index].total_harga)) + `</td>
 						</tr>
 					`);
-					total_akhir+=parseInt(res[index].harga_akhir);
+					total_akhir+=parseInt(res[index].total_harga);
 					if (res[index].qty == res[index].qty_masuk) {
 						$('#modal_tb_item_pemesanan').find('tbody tr:eq(' + index + ')').addClass('IComplete bg-green');
 					}

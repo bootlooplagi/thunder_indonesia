@@ -547,58 +547,65 @@ class Transaksi extends CI_Controller {
 		$id = $this->input->post('id');
 
 		$this->load->model('model_transaksi');
-		$ls_item = json_decode(json_encode($this->model_transaksi->list_item_pemesanan($id)),true);
+		$ls_item = $this->model_transaksi->list_item_pemesanan($id);
 
 		$stat = 0;
 
 		$error_message = array('status'=>'error','message'=>[]);
 
 		foreach ($ls_item as $key => $val) {
-			$jenis = $this->db->select('id,qty,barcode,item_name,jenis_item,is_external')->where('id',$val['id_item'])->get('pos_item');
-			// print_r($jenis);
-			if($jenis->row()->jenis_item=='ITEM'){
-				$stock_item = $this->db->select('id,qty,barcode,item_name,jenis_item,is_external')->where('id',$val['id_item'])->get('pos_item');
-				if(((int)$stock_item->row()->qty<=0 && $stock_item->row()->is_external==0)){
-					array_push($error_message['message'],array('status'=>-1,'message'=>'Stock item <b>'.$val['item_name'].'</b> dengan barcode <b>'.$val['barcode'].'</b> <b style="color:red;">tidak tersedia</b>.'));
-				}else{
-					if((int)$stock_item->row()->qty<$val['qty'] && $stock_item->row()->is_external==0){
-						array_push($error_message['message'],array('status'=>-2,'message'=>'Stock item <b>'.$val['item_name'].'</b> saat ini dengan barcode <b>'.$val['barcode'].'</b> <b style="color:red;">kurang dari jumlah pemesanan</b>.'));
+			if($val->jenis_item=='ITEM' || $val->jenis_item=='PAKET'){
+
+				$jenis = $this->db->select('id,qty,barcode,item_name,jenis_item,is_external')->where('id',$val['id_item'])->get('pos_item');
+				// print_r($jenis);
+				if($jenis->row()->jenis_item=='ITEM'){
+					$stock_item = $this->db->select('id,qty,barcode,item_name,jenis_item,is_external')->where('id',$val['id_item'])->get('pos_item');
+					if(((int)$stock_item->row()->qty<=0 && $stock_item->row()->is_external==0)){
+						array_push($error_message['message'],array('status'=>-1,'message'=>'Stock item <b>'.$val['item_name'].'</b> dengan barcode <b>'.$val['barcode'].'</b> <b style="color:red;">tidak tersedia</b>.'));
 					}else{
-						$stat++;
-											
-					}
-				}
-			}
-
-			// echo $jenis->row()->jenis_item;
-			if($jenis->row()->jenis_item=='PAKET'){
-				$stat_item = 0;
-				$id_paket = $this->db->select('id,qty,barcode,item_name,jenis_item')->where('id',$val['id_item'])->get('pos_item');
-				
-				$this->load->model('Model_produk');
-				$ls_item_paket = json_decode(json_encode($this->Model_produk->list_item_paket($id_paket->row()->id)),true);
-				
-
-				foreach ($ls_item_paket as $key => $val_item_paket) {
-
-					//print_r($val_item_paket);
-					if((int)$val_item_paket['stock']<=0){
-						array_push($error_message['message'],array('status'=>-1,'message'=>'Stock item <b>'.$val_item_paket['item_name'].'</b> dengan barcode <b>'.$val_item_paket['barcode'].'</b> pada Paket "'.$val['item_name'].'" <b style="color:red;">tidak tersedia</b>.'));
-					}else{
-						if((int)$val_item_paket['stock']<($val_item_paket['item_qty']*(int)$val['qty'])){
-							array_push($error_message['message'],array('status'=>-2,'message'=>'Stock item <b>'.$val_item_paket['item_name'].'</b> saat ini dengan barcode <b>'.$val_item_paket['barcode'].'</b> pada Paket "'.$val['item_name'].'" <b style="color:red;">kurang dari jumlah pemesanan</b>.'));
+						if((int)$stock_item->row()->qty<$val['qty'] && $stock_item->row()->is_external==0){
+							array_push($error_message['message'],array('status'=>-2,'message'=>'Stock item <b>'.$val['item_name'].'</b> saat ini dengan barcode <b>'.$val['barcode'].'</b> <b style="color:red;">kurang dari jumlah pemesanan</b>.'));
 						}else{
-							// echo "SUK";
-							$stat_item++;
+							$stat++;
 												
 						}
 					}
 				}
 
-				if($stat_item==count($ls_item_paket)){
-					$stat++;
-				}
+				// echo $jenis->row()->jenis_item;
+				if($jenis->row()->jenis_item=='PAKET'){
+					$stat_item = 0;
+					$id_paket = $this->db->select('id,qty,barcode,item_name,jenis_item')->where('id',$val['id_item'])->get('pos_item');
+					
+					$this->load->model('Model_produk');
+					$ls_item_paket = json_decode(json_encode($this->Model_produk->list_item_paket($id_paket->row()->id)),true);
+					
 
+					foreach ($ls_item_paket as $key => $val_item_paket) {
+
+						//print_r($val_item_paket);
+						if((int)$val_item_paket['stock']<=0){
+							array_push($error_message['message'],array('status'=>-1,'message'=>'Stock item <b>'.$val_item_paket['item_name'].'</b> dengan barcode <b>'.$val_item_paket['barcode'].'</b> pada Paket "'.$val['item_name'].'" <b style="color:red;">tidak tersedia</b>.'));
+						}else{
+							if((int)$val_item_paket['stock']<($val_item_paket['item_qty']*(int)$val['qty'])){
+								array_push($error_message['message'],array('status'=>-2,'message'=>'Stock item <b>'.$val_item_paket['item_name'].'</b> saat ini dengan barcode <b>'.$val_item_paket['barcode'].'</b> pada Paket "'.$val['item_name'].'" <b style="color:red;">kurang dari jumlah pemesanan</b>.'));
+							}else{
+								// echo "SUK";
+								$stat_item++;
+													
+							}
+						}
+					}
+
+					if($stat_item==count($ls_item_paket)){
+						$stat++;
+					}
+
+				}
+			}
+
+			if($val->is_free==1){
+				$stat++;
 			}
 		}
 
