@@ -10,7 +10,8 @@ class Transaksi extends CI_Controller {
 
 	}
 	public function index(){
-
+		$this->load->library('mail');
+		echo $this->mail->sendNego('bootlooplagi@gmail.com','Bootloop','Registrasi Akun Karyawan','hahahahha');
 	}
 
 ////#######################   PENGAJUAN ########################
