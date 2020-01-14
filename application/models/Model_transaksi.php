@@ -535,6 +535,16 @@ class Model_transaksi extends CI_Model {
 								$this->db->update('item_pemesanan',array('is_delete'=>1));
 							}
 						}
+
+						if(!empty($itemFree)){
+							foreach ($itemFree as $key => $value) {
+								$itemFree[$key]['id_pemesanan']=$insert_id_pemesanan;
+								$itemFree[$key]['insert_by']=$session_id;
+								$itemFree[$key]['update_by']=$session_id;
+							}
+
+							$mod_item_free = $this->db->insert_batch('item_pemesanan',$itemFree);
+						}
 						
 						// $this->db->replace_batch('item_pengajuan',$items);
 

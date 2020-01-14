@@ -1122,7 +1122,7 @@ class Transaksi extends CI_Controller {
 
         $css = [];
 
-        $pdfFilePath = "Production.pdf";
+        $pdfFilePath = "Penawaran_".$var['r'][0]->no_pemesanan.".pdf";
 
         $pdf = $this->m_pdf->load();
        	// $mpdf = new Mpdf(['format' => 'Legal']);
