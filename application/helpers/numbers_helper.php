@@ -1,4 +1,6 @@
 <?php 
+date_default_timezone_set('Asia/Jakarta');
+
 function Terbilang($x)
 {
     $abil = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
