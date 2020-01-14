@@ -60,7 +60,7 @@
           <?php } ?>
         <?php } ?>
 
-        <button class="csstooltip btn btn-xs btn-success" onclick="location.href = '<?php echo base_url('transaksi/cetak_produksi'); ?>'" data-toggle="popover"  data-placement="left" data-trigger="focus">
+        <button class="csstooltip btn btn-xs btn-success" onclick="location.href = '<?php echo base_url('transaksi/cetak_produksi/'); ?><?= $id_pem; ?>'" data-toggle="popover"  data-placement="left" data-trigger="focus">
           <span class="tooltiptext" style="width: 300%;">Print</span>
           <span class="glyphicon glyphicon-print"></span>
         </button>
