@@ -7,9 +7,7 @@ class User extends CI_Controller {
 		//$this->load->library('mail');
 		//$this->load->library('email'); //tambahkan dalam contruct pemanggil libarary mail
 	}
-	public function index(){
-		echo $this->mail->sendNego('bootlooplagi@gmail.com','Bootloop','Registrasi Akun Karyawan','hahahahha');
-	}
+	public function index(){}
 
 	public function sendMail($email=null,$nama=null,$user_id=null,$group=null,$lantai=null,$username=null,$password=null){
 		//$a = file_get_contents("file/registrasi.php");
