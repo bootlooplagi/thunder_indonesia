@@ -1139,6 +1139,48 @@ class Transaksi extends CI_Controller {
 		// $var['s']='';
   //       $this->load->view('view-print_penawaran_produksi',$var);
 
+	}	
+
+	public function cetak_surat_jalan($id=null){
+		$this->load->library('m_pdf');
+
+		$this->load->model('model_transaksi');
+        
+		$var['r']=$this->model_transaksi->list_item_pemesanan($id);
+
+		$var['ls_tgl'] = $this->db->get_where('tanggal_acara',array('id_pemesanan'=>$id,'is_delete'=>0))->result();
+
+		$var['ls_tgl_acara'] = [];
+
+		if(!empty($var['ls_tgl'])){
+			foreach ($var['ls_tgl'] as $key => $value) {
+				// echo $value->tanggal_awal;
+				array_push($var['ls_tgl_acara'],array(
+					'tanggal_awal'=>date('d M Y',strtotime($value->tanggal_awal)),
+					'tanggal_akhir'=>date('d M Y',strtotime($value->tanggal_akhir))
+				));
+			}
+		}
+
+        $css = [];
+
+        $pdfFilePath = "Production.pdf";
+
+        $pdf = $this->m_pdf->load();
+       	// $mpdf = new Mpdf(['format' => 'Legal']);
+
+        $pdf->AddPage('P','','','','','','','','',20,20);
+        
+        
+        $pdf->WriteHTML($this->load->view('view-surat_jalan',$var,TRUE));
+
+        $pdf->Output($pdfFilePath, "D");
+
+
+
+		// $var['s']='';
+  //       $this->load->view('view-print_penawaran_produksi',$var);
+
 	}
 
 	public function ck_cus($id_pem=null){

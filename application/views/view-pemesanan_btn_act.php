@@ -60,7 +60,7 @@
           <?php } ?>
         <?php } ?>
 
-        <button class="csstooltip btn btn-xs btn-success" onclick="location.href = '<?php echo base_url('transaksi/cetak_produksi/'); ?><?= $id_pem; ?>'" data-toggle="popover"  data-placement="left" data-trigger="focus">
+        <button class="csstooltip btn btn-xs btn-success"  data-toggle="popover"  data-placement="left" data-trigger="focus" onclick="location.href = '<?php echo base_url('transaksi/cetak_surat_jalan/'); ?><?= $id_pem; ?>'">
           <span class="tooltiptext" style="width: 300%;">Print</span>
           <span class="glyphicon glyphicon-print"></span>
         </button>
@@ -89,7 +89,7 @@
     <?php } ?>
 
       <?php if($s>0){ ?>
-          <button class="csstooltip btn btn-xs bg-blue" onclick="alert('Print PDF')" data-toggle="popover"  data-placement="left" data-trigger="focus" data-title="<center><b>Action</b></center>" value="<?php echo $id_pem; ?>">
+          <button class="csstooltip btn btn-xs bg-blue" onclick="location.href = '<?php echo base_url('transaksi/cetak_produksi/'); ?><?= $id_pem; ?>'" data-toggle="popover"  data-placement="left" data-trigger="focus" data-title="<center><b>Action</b></center>" value="<?php echo $id_pem; ?>">
                   <span class="tooltiptext" style="width: 300%;">Cetak PDF</span>
                   <span class="glyphicon glyphicon-print"></span>
           </button>
