@@ -186,7 +186,7 @@
               <?php foreach ($items as $key => $value) { ?>
                   produk.push({
                     id:<?php echo $value->ID_ITEM; ?>,
-                    name:"<?php echo $value->nama_item; ?>"
+                    name:`<?php echo $value->nama_item; ?>`
                   });
               <? } ?>
             <?php } ?>
