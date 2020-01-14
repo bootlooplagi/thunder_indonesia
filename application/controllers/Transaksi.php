@@ -1382,8 +1382,42 @@ class Transaksi extends CI_Controller {
 		$file = APPPATH.'../assets/doc_penawaran/'.$type.'_'.$list[0]->no_pemesanan.'_'.date('Y-m-d H_i_s').'.xlsx';
 
 		//MPDF ##############################################################
-		$this->load->library('m_pdf');
+		// $this->load->library('m_pdf');
         
+  //       $css = [];
+
+  //       $pdfFilePath = "INVOICE.pdf";
+
+  //       $pdf = $this->m_pdf->load();
+  //      	// $mpdf = new Mpdf(['format' => 'Legal']);
+
+  //       $pdf->AddPage('P','','','','','','','','',20,20);
+        
+        
+  //       $pdf->WriteHTML('DOKUMEN PRODUKSI');
+
+  //       $pdf->Output($pdfFilePath, "F");
+
+		$this->load->library('m_pdf');
+
+		// $this->load->model('model_transaksi');
+        
+		$var['r']=$this->model_transaksi->list_item_pemesanan($id);
+
+		$var['ls_tgl'] = $this->db->get_where('tanggal_acara',array('id_pemesanan'=>$id,'is_delete'=>0))->result();
+
+		$var['ls_tgl_acara'] = [];
+
+		if(!empty($var['ls_tgl'])){
+			foreach ($var['ls_tgl'] as $key => $value) {
+				// echo $value->tanggal_awal;
+				array_push($var['ls_tgl_acara'],array(
+					'tanggal_awal'=>date('d M Y',strtotime($value->tanggal_awal)),
+					'tanggal_akhir'=>date('d M Y',strtotime($value->tanggal_akhir))
+				));
+			}
+		}
+
         $css = [];
 
         $pdfFilePath = "INVOICE.pdf";
@@ -1394,7 +1428,7 @@ class Transaksi extends CI_Controller {
         $pdf->AddPage('P','','','','','','','','',20,20);
         
         
-        $pdf->WriteHTML('DOKUMEN PRODUKSI');
+        $pdf->WriteHTML($this->load->view('view-print_penawaran_produksi',$var,TRUE));
 
         $pdf->Output($pdfFilePath, "F");
 
