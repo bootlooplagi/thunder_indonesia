@@ -655,6 +655,8 @@ class Transaksi extends CI_Controller {
 
 					$log = $this->log_status->add_log($id,1,$jenis_pemesanan->row()->jenis);
 					$this->db->insert('log_status_pemesanan',$log);
+
+					$this->ch_stat_from_admin($id,5);
 				}else{
 					echo json_encode(array('status'=>'error','message'=>array(0=>array('status'=>'error','message'=>'Error DB. Err Code (7676)'))));
 				}
@@ -1104,8 +1106,26 @@ class Transaksi extends CI_Controller {
 		$this->load->library('m_pdf');
 
 		$this->load->model('model_transaksi');
+
+
         
 		$var['r']=$this->model_transaksi->list_item_pemesanan($id);
+		$var['kat'] = $this->model_transaksi->katItemPemesanan($id);
+
+		foreach ($var['kat'] as $key => $value) {
+			$var['total'][$value->id] = 0;
+			foreach ($var['r'] as $k => $v) {
+				if($value->id==$v->id_kat){
+					$var['total'][$value->id]+=$v->total_harga;
+				}
+			}
+		}
+
+		// print_r($var['total']);
+		
+
+		// return false;
+		// // $var['id_kategori']
 
 		$var['ls_tgl'] = $this->db->get_where('tanggal_acara',array('id_pemesanan'=>$id,'is_delete'=>0))->result();
 
@@ -1133,7 +1153,7 @@ class Transaksi extends CI_Controller {
         
         $pdf->WriteHTML($this->load->view('view-print_penawaran_produksi',$var,TRUE));
 
-        $pdf->Output($pdfFilePath, "D");
+        $pdf->Output($pdfFilePath, "I");
 
 
 

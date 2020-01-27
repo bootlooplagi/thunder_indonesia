@@ -570,7 +570,8 @@
                                               </select>
                                             </td>
                                             <td>
-                                                <button class="btn btn-success form-control btn-xs" onclick="make_new_item(event)">Item tidak ada?</button></td>
+                                              <!--   <button class="btn btn-success form-control btn-xs" onclick="make_new_item(event)">Item tidak ada?</button> -->
+                                              </td>
                                             <td></td>
                                             <td width="100px">
                                                 <input style="width: 70px;" <?php echo nego(); ?> onkeydown="enter(event)" type="number" min="1" class="form-control" id="qty" req-add-item placeholder="Qty">

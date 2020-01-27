@@ -594,6 +594,9 @@ class Model_transaksi extends CI_Model {
 		}
 		
 		$query = $this->db->query('	select 		
+												i.is_external,
+												k.id as id_kat,
+												k.description as kategori,
 												p.id,p.no_pemesanan,
 												p.tgl_pemesanan,
 												p.`status`,
@@ -627,6 +630,7 @@ class Model_transaksi extends CI_Model {
 												up.lantai,
 												i.jenis_item,
 												i.satuan,
+												i.id_sub_kategori,
 												ip.total_harga,
 												ip.harga,
 												ip.disc,
@@ -650,7 +654,7 @@ class Model_transaksi extends CI_Model {
 											join item_pemesanan as ip
 											left join pos_item as i on ip.id_item=i.id
 											join user as up
-											
+											left JOIN pos_kategori AS k ON i.id_kategori=k.id
 									where p.id='.$id.' and 
 											ip.id_pemesanan=p.id and 
 											ip.is_delete=0 and 
@@ -658,6 +662,36 @@ class Model_transaksi extends CI_Model {
 
 									order by ip.id_item asc
 											');
+
+		if ($query->num_rows() > 0){
+		    return $query->result();
+		}else{
+		    return NULL;
+		}
+	}
+
+	public function katItemPemesanan($id_pem=null){
+		$id;
+
+		if($id_pem==null){
+			$id = $this->input->post('id');
+		}else{
+			$id=$id_pem;
+		}
+		
+		$query = $this->db->query('	select 		
+											k.id,
+											k.description AS nama_kategori
+									from pemesanan as p
+											join item_pemesanan as ip
+											left join pos_item as i on ip.id_item=i.id
+											left JOIN pos_kategori AS k ON i.id_kategori=k.id
+									where p.id='.$id.' and 
+											ip.id_pemesanan=p.id and 
+											ip.is_delete=0
+									GROUP BY k.id
+									order by k.description asc
+				');
 
 		if ($query->num_rows() > 0){
 		    return $query->result();

@@ -1296,10 +1296,12 @@ function ch_select(x){
 		$('#sel_durasi').empty();
 		if(response=='null'){
 			res = [];
+			$('#sel_durasi').append(`<option>-- Pilih Durasi --</option>`);
+			$('#sel_durasi').append(`<option>--- Tambah Durasi? ---</option>`);
 		}else{
 			res = JSON.parse(response);
 			
-
+			$('#sel_durasi').append(`<option>-- Pilih Durasi --</option>`);
 			res.forEach(function(item,index){
 				$('#sel_durasi').append(`<option value="`+item.id+`|`+item.harga+`|`+item.name+`">`+item.name+` - Rp `+f_cur(item.harga)+`</option>`);
 			});
@@ -1459,7 +1461,7 @@ function add_crew(x=null,y=null){
 				self.setContent("");
 	            self.setContentAppend(response);
 	            self.setTitle(`	<script src="`+URL+`assets/scripts/freelance.js"></script>
-					            Pilih Driver atau 
+					            Pilih Crew atau 
 					            <div class="autocomplete">
 					                <input id="myInput" type="text" name="myCountry" placeholder="Input Nama Freelancer">
 					            </div>
@@ -2218,4 +2220,102 @@ function del_date(el,server=null,id=null){
 	}
 
 	console.log(del_date_server);
+}
+
+
+var arrDurasi = [];
+var delDurasi = [];
+function add_durasi(id=null) {
+    $.alert({
+        title:"Tambah durasi",
+        content:function(){
+            var is = this;
+            var list = $('#list_durasi');
+
+            arrDurasi.forEach(function(item,index){
+                var del = function(){
+                    if(item.id!=''){
+                        return "delDurasiServer("+item.id+",$(this))";
+                    }
+                    if(item.id==''){
+                        return "$(this).parent().remove()";
+                    }
+                }
+
+                
+                list.append(`
+                        <li class="list-group-item clearfix">
+                            <div class="col-sm-10 durasi">
+                                <i class="d_id" style="display:none">`+item.id+`</i>
+                                <b class="d_name">`+item.name+`</b><br>
+                                <i class="d_harga">`+item.harga+`</i>
+                            </div>
+                            <div class="btn btn-danger col-sm-2" onclick="`+del()+`">
+                                <span class="fa fa-trash"></span>
+                            </div>
+                        </li>
+                `);
+
+            });
+          
+            return $('#add_durasi').html();
+        },buttons:{
+            ok:{
+                text:"<span class='fa fa-plus'></span>&nbsp;Add",
+                btnClass:"btn-primary",
+                action:function(){
+                    var it = this;
+                    var name = it.$content.find('input[name="name"]').val();
+                    var harga = it.$content.find('input[name="harga"]').val();
+
+                    var ls = it.$content.find('#list_durasi');
+
+                    ls.append(`
+                            <li class="list-group-item clearfix">
+                                <div class="col-sm-10 durasi">
+                                    <i class="d_id" style="display:none"></i>
+                                    <b class="d_name">`+name+`</b><br>
+                                    <i class="d_harga">`+harga+`</i>
+                                </div>
+                                <div class="btn btn-danger col-sm-2" onclick="$(this).parent().remove()">
+                                    <span class="fa fa-trash"></span>
+                                </div>
+                            </li>
+                    `);
+
+                    return false;
+                }
+            },close:{
+                text:"Close",
+                action:function(){
+                    arrDurasi = [];
+                    
+                    $('#list_durasi').empty();
+
+                    var it = this;
+                    var arrName = it.$content.find('.d_name').toArray();
+                    var selName = it.$content.find('.d_name');
+
+                    var arrHarga = it.$content.find('.d_harga').toArray();
+                    var selHarga = it.$content.find('.d_harga');
+
+                    var arrID = it.$content.find('.d_id').toArray();
+                    var selID = it.$content.find('.d_id');
+
+                    arrName.forEach(function(item,index){
+                        arrDurasi.push({
+                            id:selID.eq(index).html(),
+                            name:selName.eq(index).html(),
+                            harga:selHarga.eq(index).html()
+                        });
+                    });
+                }
+            }
+        }
+    });
+}
+
+function delDurasiServer(id,el){
+    delDurasi.push(id);
+    el.parent().remove();
 }

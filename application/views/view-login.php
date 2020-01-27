@@ -75,7 +75,8 @@
         </div>
         <div class="col-xs-12" style="text-align: center;">
         <br>
-              <a href="<?php echo base_url('user/register'); ?>">Register</a> | <a href="<?php echo base_url('user/forget'); ?>">Forget Password</a>
+              <!-- <a href="<?php echo base_url('user/register'); ?>">Register</a> -->
+              <a href="<?php echo base_url('user/forget'); ?>">Forget Password</a>
         </div>
         <!-- /.col -->
       </div>

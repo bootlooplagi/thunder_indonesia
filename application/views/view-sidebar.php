@@ -49,11 +49,19 @@
   <?php } ?>
 
   <?php if($user == 'Super Admin'||$user=='Kepala Divisi'){ ?>
-      <li class="<?php echo $s_active=='service' ? 'active':''; ?>"><a href="<?php echo base_url('service'); ?>"><i  class="glyphicon glyphicon-wrench"></i>Service</a></li>
+      <li class="<?php echo $s_active=='service' ? 'active':''; ?>">
+        <a href="<?php echo base_url('service'); ?>">
+          <i  class="glyphicon glyphicon-wrench"></i><span>Service</span>
+        </a>
+      </li>
   <?php } ?>
   
   <?php if($user=='Super Admin'||$user=='Kepala Divisi'||$user=='Admin'||$user=='Karyawan'||$user=='Kurir'||$user=='Admin Gudang'){ ?>
-      <li class="<?php echo $s_active=='extra' ? 'active':''; ?>"><a href="<?php echo base_url('transaksi/extra_charge_view'); ?>"><i class="glyphicon glyphicon-usd"></i> <span>Extra Charge</span></a></li>
+      <li class="<?php echo $s_active=='extra' ? 'active':''; ?>">
+        <a href="<?php echo base_url('transaksi/extra_charge_view'); ?>">
+          <i class="glyphicon glyphicon-usd"></i> <span>Extra Charge</span>
+        </a>
+      </li>
   <?php } ?>
 
 
