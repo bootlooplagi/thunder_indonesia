@@ -147,150 +147,211 @@ function enter(event) {
 }
 
 function add_item() {
-	
-	var valid = validate('req-add-item');
+	if(is_durasi==0){
+		let item_val = $('#item_select').val().split('|');
 
-	if (valid && $('#qty').val() >= 1 ) {
-		var match = false;
-		if($('#item_select').val()!=null){
-			
-			var item_val = $('#item_select').val().split('|');
-			var item_durasi = $('#sel_durasi').val().split('|');
+		$.confirm({
+			title:'Durasi kosong.',
+			content:'Tambahkan durasi?',
+			buttons:{
+				ya:{
+					text:'Ya, Tambahkan.',
+					btnClass:'btn-primary',
+					action:function(){
+						$.confirm({
+							title:'Tambah Durasi.',
+							content:`
+								    <div id="add_durasi">
+								      <input type="hidden" name="id_item" class="form-control">
+								      <div class="form-group col-sm-12">
+								        <label>Nama</label>
+								        <input type="text" name="name" class="form-control">
+								      </div>
+								      <div class="form-group col-sm-12">
+								        <label>Harga</label>
+								        <input type="text" name="harga" class="form-control">
+								      </div>
+								    </div>
+							`,buttons:{
+								simpan:{
+									text:'Simpan',
+									btnClass:'btn btn-success',
+									action:function(){
+										var self = this;
+										var name = self.$content.find('input[name="name"]').val();
+										var harga = self.$content.find('input[name="harga"]').val();
 
-			var indexIt = $('#item_select').prop('selectedIndex');
-
-			if(parseInt($('#qty').val())>item_val[3] && item_val[4]=='ITEM' && item_val[6]==0){
-				$.alert('Stock Item : ' + item_val[3] + '<br>Stock kurang dari jumlah permintaan.');
-			}else{
-
-					var qty = parseInt(($('#qty').val()=='')?'0':$('#qty').val());
-					var disc = parseInt(($('#disc').val()=='')?'0':$('#disc').val());
-					var extra_charge = parseInt(($('#extra').val()=='')?'0':$('#extra').val());
-					var harga = parseInt(item_durasi[1]);
-					var total = parseInt(parseInt(item_durasi[1])*qty);
-					var durasi_name = item_durasi[2];
-
-
-					var net = parseInt((harga*qty)-((harga*qty)*(disc/100))+((harga*qty)*(extra_charge/100)));
-					// alert(total);
-					// alert('1');
-					try {
-						$.each($('#tb_item_pemesanan').find('tbody tr'), function(index, val) {
-
-							var barcode = $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(1)').html();
-							var hrg = clear_f_cur(DataTableItem.cell(index,6).data());
+										$.post(URL+'produk/add_durasi',{id_item:item_val[0],name:name,harga:harga}).done((data)=>{
+											if(data==1){
+												alert('Sukses menambahkan durasi.');
+												ch_select(item_val[0]);
+											}else{
+												if(data==0){
+													alert('Gagal menambahkan durasi.');
+												}else{
+													alert('Terjadi kesalahan.');
+												}
+											}
 
 
-							if (item_val[1] == barcode && harga==hrg) {
-
-								match = true;
-								// var jml = $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(5)').html();
-								var jml = DataTableItem.cell(index,5).data();
-								
-								// alert();
-								// var harga_jual = clear_f_cur($('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(6)').html());
-								var harga_jual = clear_f_cur(DataTableItem.cell(index,6).data());
-								// alert(harga_jual);
-
-
-
-								// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(5)').html(parseInt(jml) + parseInt(qty));
-								// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(6)').html(f_cur(harga_jual));
-								// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(7)').html(f_cur((parseInt(jml)+qty) * parseInt(harga_jual)));
-								// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(8)').html(disc);
-								// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(9)').html(extra_charge);
-								// var harga_total = (parseInt(jml)+qty) * parseInt(harga_jual);
-
-								// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(10)').html(f_cur(((parseInt(jml)+qty) * parseInt(harga_jual))-(harga_total*(disc/100))+(harga_total*(extra_charge/100))));
-								DataTableItem.cell(index,5).data(parseInt(jml) + parseInt(qty)).draw(false);
-								DataTableItem.cell(index,6).data(f_cur(harga_jual)).draw(false);
-								DataTableItem.cell(index,7).data(f_cur((parseInt(jml)+qty) * parseInt(harga_jual))).draw(false);
-								DataTableItem.cell(index,8).data(disc).draw(false);
-								DataTableItem.cell(index,9).data(extra_charge).draw(false);
-								DataTableItem.cell(index,10).data(durasi_name).draw(false);
-								var harga_total = (parseInt(jml)+qty) * parseInt(harga_jual);
-								DataTableItem.cell(index,11).data(f_cur(((parseInt(jml)+qty) * parseInt(harga_jual))-(harga_total*(disc/100))+(harga_total*(extra_charge/100)))).draw(false);
-								DataTableItem.cell(index,14).data(item_durasi[0]).draw(false);
+										}).fail();
+									}
+								}
 							}
-
 						});
-					} catch (e) {
-						console.log(e);
-					} finally {
-
-						var cItem = $('#tb_item_pemesanan').find('tbody tr').length - 1;
-						//no = parseInt($('#tb_item_pemesanan').find('tbody tr:eq('+cItem+') td:eq(0)').html());
-
-
-
-						if (match == false) {
-							// // alert('2');
-							// $('#tb_item_pemesanan').find('tbody').append(`
-							// 			<tr>
-							// 			<input type="hidden" class="id_item" value="` + item_val[0] + `">
-							// 			<input type="hidden" class="id_it_pemesanan">
-							// 			<td class="no_item"></td>
-							// 			<td>` + item_val[1] + `</td>
-							// 			<td>` + item_val[2] + `</td>
-							// 			<td>` + item_val[4] + `</td>
-							// 			<td>` + item_val[3] + `</td>
-							// 			<td>` + qty + `</td>
-							// 			<td>` + f_cur(harga) + `</td>
-							// 			<td>` + f_cur(total) + `</td>
-							// 			<td>` + disc + `</td>
-							// 			<td>` + extra_charge + `</td>
-							// 			<td>` + f_cur(net) + `</td>
-							// 			<td>
-							// 			<button onclick="del_item($(this))" type="button" class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete">
-							// 			<span class="glyphicon glyphicon-trash"></span>
-							// 			</button>
-							// 			</td>
-							// 			</tr>
-							// 			`);
-							// $('#tb_item_pemesanan').DataTable();
-
-							// DataTableItem.draw(false);
-							// DataTableItem;
-							// DataTableItem.row.node();
-							DataTableItem.row.add([
-													`<input type="hidden" class="id_item" value="` + item_val[0] + `"><input type="hidden" class="id_it_pemesanan"><p class="no_item"></p>`,
-													item_val[1],
-													item_val[2],
-													item_val[4],
-													item_val[3],
-													qty,
-													f_cur(harga),
-													f_cur(total),
-													disc,
-													extra_charge,
-													durasi_name,
-													f_cur(net),
-													`<button onclick="del_item($(this))" type="button" class="btn btn-danger btn-xs" data-toggle="tooltip" title="Delete">
-														<span class="glyphicon glyphicon-trash"></span>
-													</button>`,
-													'',
-													item_durasi[0]
-												]).draw(false);
-							
-
-							$.each($('#tb_item_pemesanan').find('tbody tr'), function(index, val) {
-								$('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(0) p.no_item').html(index + 1);
-							});
-							//$('#qty').val('1');
-
-						}
-						$('#bc').focus().val('');
-						$('#qty').val('');
-						$('#item_select').prop('selectedIndex',0).select2();
 					}
+				},
+				close:{
+					text:'Batal'
+				}
 			}
-		}else{
-			$.alert('Anda belum memilih Item.');
-			return false;
+		});
+	}else{
+		var valid = validate('req-add-item');
+
+		if (valid && $('#qty').val() >= 1 ) {
+			var match = false;
+			if($('#item_select').val()!=null){
+				
+				var item_val = $('#item_select').val().split('|');
+				var item_durasi = $('#sel_durasi').val().split('|');
+
+				var indexIt = $('#item_select').prop('selectedIndex');
+
+				if(parseInt($('#qty').val())>item_val[3] && item_val[4]=='ITEM' && item_val[6]==0){
+					$.alert('Stock Item : ' + item_val[3] + '<br>Stock kurang dari jumlah permintaan.');
+				}else{
+
+						var qty = parseInt(($('#qty').val()=='')?'0':$('#qty').val());
+						var disc = parseInt(($('#disc').val()=='')?'0':$('#disc').val());
+						var extra_charge = parseInt(($('#extra').val()=='')?'0':$('#extra').val());
+						var harga = parseInt(item_durasi[1]);
+						var total = parseInt(parseInt(item_durasi[1])*qty);
+						var durasi_name = item_durasi[2];
+
+
+						var net = parseInt((harga*qty)-((harga*qty)*(disc/100))+((harga*qty)*(extra_charge/100)));
+						// alert(total);
+						// alert('1');
+						try {
+							$.each($('#tb_item_pemesanan').find('tbody tr'), function(index, val) {
+
+								var barcode = $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(1)').html();
+								var hrg = clear_f_cur(DataTableItem.cell(index,6).data());
+
+
+								if (item_val[1] == barcode && harga==hrg) {
+
+									match = true;
+									// var jml = $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(5)').html();
+									var jml = DataTableItem.cell(index,5).data();
+									
+									// alert();
+									// var harga_jual = clear_f_cur($('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(6)').html());
+									var harga_jual = clear_f_cur(DataTableItem.cell(index,6).data());
+									// alert(harga_jual);
+
+
+
+									// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(5)').html(parseInt(jml) + parseInt(qty));
+									// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(6)').html(f_cur(harga_jual));
+									// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(7)').html(f_cur((parseInt(jml)+qty) * parseInt(harga_jual)));
+									// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(8)').html(disc);
+									// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(9)').html(extra_charge);
+									// var harga_total = (parseInt(jml)+qty) * parseInt(harga_jual);
+
+									// $('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(10)').html(f_cur(((parseInt(jml)+qty) * parseInt(harga_jual))-(harga_total*(disc/100))+(harga_total*(extra_charge/100))));
+									DataTableItem.cell(index,5).data(parseInt(jml) + parseInt(qty)).draw(false);
+									DataTableItem.cell(index,6).data(f_cur(harga_jual)).draw(false);
+									DataTableItem.cell(index,7).data(f_cur((parseInt(jml)+qty) * parseInt(harga_jual))).draw(false);
+									DataTableItem.cell(index,8).data(disc).draw(false);
+									DataTableItem.cell(index,9).data(extra_charge).draw(false);
+									DataTableItem.cell(index,10).data(durasi_name).draw(false);
+									var harga_total = (parseInt(jml)+qty) * parseInt(harga_jual);
+									DataTableItem.cell(index,11).data(f_cur(((parseInt(jml)+qty) * parseInt(harga_jual))-(harga_total*(disc/100))+(harga_total*(extra_charge/100)))).draw(false);
+									DataTableItem.cell(index,14).data(item_durasi[0]).draw(false);
+								}
+
+							});
+						} catch (e) {
+							console.log(e);
+						} finally {
+
+							var cItem = $('#tb_item_pemesanan').find('tbody tr').length - 1;
+							//no = parseInt($('#tb_item_pemesanan').find('tbody tr:eq('+cItem+') td:eq(0)').html());
+
+
+
+							if (match == false) {
+								// // alert('2');
+								// $('#tb_item_pemesanan').find('tbody').append(`
+								// 			<tr>
+								// 			<input type="hidden" class="id_item" value="` + item_val[0] + `">
+								// 			<input type="hidden" class="id_it_pemesanan">
+								// 			<td class="no_item"></td>
+								// 			<td>` + item_val[1] + `</td>
+								// 			<td>` + item_val[2] + `</td>
+								// 			<td>` + item_val[4] + `</td>
+								// 			<td>` + item_val[3] + `</td>
+								// 			<td>` + qty + `</td>
+								// 			<td>` + f_cur(harga) + `</td>
+								// 			<td>` + f_cur(total) + `</td>
+								// 			<td>` + disc + `</td>
+								// 			<td>` + extra_charge + `</td>
+								// 			<td>` + f_cur(net) + `</td>
+								// 			<td>
+								// 			<button onclick="del_item($(this))" type="button" class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete">
+								// 			<span class="glyphicon glyphicon-trash"></span>
+								// 			</button>
+								// 			</td>
+								// 			</tr>
+								// 			`);
+								// $('#tb_item_pemesanan').DataTable();
+
+								// DataTableItem.draw(false);
+								// DataTableItem;
+								// DataTableItem.row.node();
+								DataTableItem.row.add([
+														`<input type="hidden" class="id_item" value="` + item_val[0] + `"><input type="hidden" class="id_it_pemesanan"><p class="no_item"></p>`,
+														item_val[1],
+														item_val[2],
+														item_val[4],
+														item_val[3],
+														qty,
+														f_cur(harga),
+														f_cur(total),
+														disc,
+														extra_charge,
+														durasi_name,
+														f_cur(net),
+														`<button onclick="del_item($(this))" type="button" class="btn btn-danger btn-xs" data-toggle="tooltip" title="Delete">
+															<span class="glyphicon glyphicon-trash"></span>
+														</button>`,
+														'',
+														item_durasi[0]
+													]).draw(false);
+								
+
+								$.each($('#tb_item_pemesanan').find('tbody tr'), function(index, val) {
+									$('#tb_item_pemesanan').find('tbody tr:eq(' + index + ') td:eq(0) p.no_item').html(index + 1);
+								});
+								//$('#qty').val('1');
+
+							}
+							$('#bc').focus().val('');
+							$('#qty').val('');
+							$('#item_select').prop('selectedIndex',0).select2();
+						}
+				}
+			}else{
+				$.alert('Anda belum memilih Item.');
+				return false;
+
+			}
 
 		}
-
 	}
+	
 
 	// $('#tb_item_pemesanan').DataTable({
  //        responsive: {
@@ -471,12 +532,12 @@ function submit(x,type=null) {
 
 						var stock = parseInt(DataTableItem.cell(index,4).data());
 						var qty = parseInt(DataTableItem.cell(index,5).data());
-						var jenis = parseInt(DataTableItem.cell(index,3).data());
+						var jenis = DataTableItem.cell(index,3).data();
 						var disc = parseInt(DataTableItem.cell(index,8).data());
 						var extra_charge = parseInt(DataTableItem.cell(index,9).data());
 						var sub = parseInt(DataTableItem.cell(index,6).data());
 						var durasi = parseInt(DataTableItem.cell(index,14).data());
-
+						// alert(DataTableItem.cell(index,3).data());
 						if(stock<qty && jenis=='ITEM'){
 							itemError.push({
 								barcode:DataTableItem.cell(index,1).data(),
@@ -494,6 +555,7 @@ function submit(x,type=null) {
 								background:'#fd9c9c'
 							});
 						}else{
+
 							itemSuccess.push({
 								barcode:DataTableItem.cell(index,1).data(),
 								name:DataTableItem.cell(index,2).data(),
@@ -543,6 +605,7 @@ function submit(x,type=null) {
 						var nomor = $('#no_pemesanan').html();
 						var items = [];
 						try {
+
 							$.each(DataTableItem.rows().data(),function(index,val){
 							// $.each($('.id_item'), function(index, val) {
 								// if($.parseHTML(DataTableItem.cell(index,0).data())[0].value=='FREE'){
@@ -555,7 +618,7 @@ function submit(x,type=null) {
 								// var disc = $('.id_item').eq(index).parents('tbody tr').find('td:eq(8)').html();
 								// var extra_charge = $('.id_item').eq(index).parents('tbody tr').find('td:eq(9)').html();
 								// var sub = $('.id_item').eq(index).parents('tbody tr').find('td:eq(6)').html();
-
+								// console.log($.parseHTML(DataTableItem.cell(index,0).data()));
 								if(id_i=='FREE'){
 									
 									
@@ -588,7 +651,7 @@ function submit(x,type=null) {
 										'extra_charge': extra_charge,
 										'harga': clear_f_cur(sub),
 										'total_harga':clear_f_cur(net),
-										'durasi':clear_f_cur(durasi_id)
+										'durasi':durasi_id
 									});
 
 
@@ -596,7 +659,7 @@ function submit(x,type=null) {
 
 							});
 						} catch (e) {
-
+							console.log(e);
 						} finally {
 
 							var msg = '';
@@ -628,6 +691,9 @@ function submit(x,type=null) {
 								return false;
 
 							}
+
+							// console.log(items);
+							// return false;
 
 							// alert(id);
 							$.post(URL + 'transaksi/trx_pemesanan?type='+type, {
@@ -1282,6 +1348,8 @@ function conf_to_prod(x){
 	});
 }
 
+var is_durasi = 0;
+
 function ch_select(x){
 	var v = x.split("|");
 	$('#bc').val(v[1]); 
@@ -1295,13 +1363,14 @@ function ch_select(x){
 		var res;
 		$('#sel_durasi').empty();
 		if(response=='null'){
+			is_durasi = 0;
 			res = [];
-			$('#sel_durasi').append(`<option>-- Pilih Durasi --</option>`);
-			$('#sel_durasi').append(`<option>--- Tambah Durasi? ---</option>`);
+			// $('#sel_durasi').append(`<option>-- Pilih Durasi --</option>`);
+			// $('#sel_durasi').append(`<option>--- Tambah Durasi? ---</option>`);
 		}else{
+			is_durasi = 1;
 			res = JSON.parse(response);
 			
-			$('#sel_durasi').append(`<option>-- Pilih Durasi --</option>`);
 			res.forEach(function(item,index){
 				$('#sel_durasi').append(`<option value="`+item.id+`|`+item.harga+`|`+item.name+`">`+item.name+` - Rp `+f_cur(item.harga)+`</option>`);
 			});

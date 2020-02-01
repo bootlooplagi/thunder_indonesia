@@ -514,9 +514,9 @@
                                               <?php $no=1; foreach($list as $key => $value) { ?>
                                                 
                                                 <tr>
-                                                  <input type="hidden" class="id_item" value="<?php echo $value->ID_ITEM; ?>">
-                                                  <input type="hidden" class="id_it_pemesanan" value="<?php echo $value->ID_IT_PEMESANAN; ?>">
-                                                  <td><p class="no_item"><?php echo $no; ?></p></td>
+                                                  <td>
+                                                      <input type="hidden" class="id_item" value="<?php echo $value->ID_ITEM; ?>"><input type="hidden" class="id_it_pemesanan" value="<?php echo $value->ID_IT_PEMESANAN; ?>"><p class="no_item"><?php echo $no; ?></p>
+                                                  </td>
                                                   <td><?php echo $value->barcode; ?></td>
                                                   <td><?php echo $value->item_name; ?></td>
                                                   <td><?php echo $value->jenis_item; ?></td>
@@ -527,7 +527,7 @@
                                                   <td width="75px;"><?php echo $value->disc; ?></td>
                                                   <td><?php echo $value->extra_charge; ?></td>
                                                   <td><?php echo $value->name_durasi; ?></td>
-                                                  <td title="<?php echo 'Harga Asli : '.number_format($value->total_all,0,",","."); ?>" style="width: 150px;" class="net" data-net="<?php echo $value->total_harga; ?>"><?php echo number_format($value->total_harga,0,",","."); ?></td>
+                                                  <td title="<?php echo 'Harga Asli : '.number_format($value->total_all,0,",","."); ?>" style="width: 150px;" class="net" data-net="<?php echo $value->total_harga; ?>"><?php echo number_format($value->total_all,0,",","."); ?></td>
 
                                                   <td style="width: 100px;" class="btn-nego">
                                                     <button <?php echo btn_edit_nego(); ?> type="button" class="btn-edit-nego btn btn-warning btn-sm" data-toggle="tooltip" title="Edit Harga (Harga Asli : <?php echo number_format($value->total_all,0,",","."); ?>)">

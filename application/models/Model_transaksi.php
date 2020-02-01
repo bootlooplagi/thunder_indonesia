@@ -258,7 +258,7 @@ class Model_transaksi extends CI_Model {
 										p.duration,
 										p.jenis,
 										(select r.rate from rating as r where r.id_pemesanan=p.id) as rating,
-										(select count(id) from item_pemesanan where id_pemesanan=p.id) as jml_item,
+										(select count(id) from item_pemesanan where id_pemesanan=p.id and is_delete=0) as jml_item,
 										u_u.user_type,
 										u_u.username,
 										u_u.name as update_by
@@ -504,7 +504,7 @@ class Model_transaksi extends CI_Model {
 									// 	$nego="";
 									// }
 
-									$q = 'insert into item_pemesanan (id,id_pemesanan,id_item,qty,h_stock,disc,extra_charge,harga,total_harga,insert_by,update_by) 
+									$q = 'insert into item_pemesanan (id,id_pemesanan,id_item,qty,h_stock,disc,extra_charge,durasi,harga,total_harga,insert_by,update_by) 
 										values('. $id_i .','
 												. $items[$key]['id_pemesanan'] .','
 												. $items[$key]['id_item'] .','
@@ -512,6 +512,7 @@ class Model_transaksi extends CI_Model {
 												. $items[$key]['h_stock'] .','
 												. $items[$key]['disc'] .','
 												. $items[$key]['extra_charge'] .','
+												. $items[$key]['durasi'] .','
 												. $items[$key]['harga'] .','
 												. $items[$key]['total_harga'] .','
 												. $items[$key]['insert_by'] .','
@@ -520,6 +521,7 @@ class Model_transaksi extends CI_Model {
 												h_stock='. $items[$key]['h_stock'] . ',
 												disc='. $items[$key]['disc'] . ',
 												extra_charge='. $items[$key]['extra_charge'] . ',
+												durasi='. $items[$key]['durasi'] . ',
 												harga='. $items[$key]['harga'] . ',
 												total_harga='. $items[$key]['total_harga'];
 									$mod_item += $this->db->query($q);
@@ -538,12 +540,13 @@ class Model_transaksi extends CI_Model {
 
 						if(!empty($itemFree)){
 							foreach ($itemFree as $key => $value) {
-								$itemFree[$key]['id_pemesanan']=$insert_id_pemesanan;
+								$itemFree[$key]['id_pemesanan']=$id;
 								$itemFree[$key]['insert_by']=$session_id;
 								$itemFree[$key]['update_by']=$session_id;
 							}
 
-							$mod_item_free = $this->db->insert_batch('item_pemesanan',$itemFree);
+							$mod_item += $this->db->insert_batch('item_pemesanan',$itemFree);
+
 						}
 						
 						// $this->db->replace_batch('item_pengajuan',$items);
@@ -573,7 +576,7 @@ class Model_transaksi extends CI_Model {
 						if($mod_db==1 && $mod_item>0){
 							return '{"status":"1","message":"Sukses Mengubah Pemesanan"}';
 						}else{
-							return '{"status":"-1","message":"Error Mengubah Pemesanan (Item Kosong) => DB '.$mod_db.' & IT '.$mod_item.'"}';
+							return '{"status":"-1","message":"Sukses Mengubah Pemesanan.<br><br><small>Tidak ada item yang dirubah.</small>"}';
 						}
 					}
 				}
@@ -709,14 +712,14 @@ class Model_transaksi extends CI_Model {
 												p.update_date,
 												ip.id as ID_IT_PEMESANAN,
 												i.id as ID_ITEM,
-												i.item_name,
-												i.barcode,
+												if(ip.is_free=1,ip.`name`,i.item_name) AS item_name,
+												if(ip.is_free=1,ip.`barcode`,i.barcode) AS barcode,
 												(select u.name as kurir_name from user as u,pemesanan as p where p.id_kurir=u.id and p.id='.$id.') as kurir_name,
 												i.qty as i_qty,
-												i.jenis_item,
-												(select name from durasi where id=ip.durasi) as name_durasi,
+												if(ip.is_free=1,\'ITEM BEBAS\',i.jenis_item) AS jenis_item,
+												if(ip.is_free=1,concat(ip.durasi,\' Hari\'),(select name from durasi where id=ip.durasi)) AS name_durasi,
 												ip.disc,
-												ip.extra_charge,
+												if(ip.is_free=1,0,ip.extra_charge) AS extra_charge,
 												ip.harga,
 												ip.total_harga,
 												(select (qty*harga) from item_pemesanan where id=ip.id) as total,

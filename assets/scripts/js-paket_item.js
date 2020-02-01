@@ -206,61 +206,74 @@ function add_item(){
 		var match = false;
 		if($('#item_select').val()!=null){
 			var item_val = $('#item_select').val().split('|');
-			var indexIt = $('#item_select').prop('selectedIndex');
 
-			
-			var qty = $('#qty').val();
 
-			try{
-				$.each($('#tb_item_paket').find('tbody tr'), function(index, val) {
-					var barcode = $('#tb_item_paket').find('tbody tr:eq('+ index +') td:eq(1)').html();
-					if(item_val[1]==barcode){
-						match=true;
-						var jml = $('#tb_item_paket').find('tbody tr:eq('+ index +') td:eq(5)').html();
-						var h_satuan = clear_f_cur($('#tb_item_paket').find('tbody tr:eq('+ index +') td:eq(4)').html());
-						//alert(h_satuan +'>'+jml+'>'+qty);
-						$('#tb_item_paket').find('tbody tr:eq('+ index +') td:eq(5)').html(parseInt(jml)+parseInt(qty));
-						$('#tb_item_paket').find('tbody tr:eq('+ index +') td:eq(6)').html(f_cur(parseInt(h_satuan)*(parseInt(jml)+parseInt(qty))));
-					}
-				});
-			}catch(e){
+			if(parseInt(item_val[3])<parseInt($('#qty').val())){
+				$.alert('Jumlah Qty melebihi jumlah Stock.');
+			}else{
+				var indexIt = $('#item_select').prop('selectedIndex');
 
-			}finally{
-				
-				var cItem = $('#tb_item_paket').find('tbody tr').length -1;
-				//no = parseInt($('#tb_item_paket').find('tbody tr:eq('+cItem+') td:eq(0)').html());
+
 
 				
-				
-				if(match==false){
-					//var qty_ttl = $('#tb_item_paket').find('tbody tr td:eq(4)').html();
-				 	$('#tb_item_paket').find('tbody').append(`
-						<tr>
-							<input type="hidden" class="id_item" value="`+ item_val[0] +`">
-							<input type="hidden" class="id_it_paket">
-							<td class="no_item"></td>
-							<td>`+ item_val[1] +`</td>
-							<td>`+ item_val[2] +`</td>
-							<td>`+ item_val[3] +`</td>
-							<td>`+ f_cur(item_val[4]) +`</td>
-							<td>`+ qty +`</td>
-							<td>`+ f_cur((parseInt(qty)*parseInt(item_val[4]))) +`</td>
-							
-							<td>
-								<button onclick="del_item($(this))" type="button" class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete">
-									<span class="glyphicon glyphicon-trash"></span>
-								</button>
-							</td>
-						</tr>
-					`);
+				var qty = $('#qty').val();
 
+				try{
 					$.each($('#tb_item_paket').find('tbody tr'), function(index, val) {
-						 $('#tb_item_paket').find('tbody tr:eq('+index+') td:eq(0)').html(index+1);
+						var barcode = $('#tb_item_paket').find('tbody tr:eq('+ index +') td:eq(1)').html();
+						if(item_val[1]==barcode){
+							match=true;
+							var jml = $('#tb_item_paket').find('tbody tr:eq('+ index +') td:eq(5)').html();
+							if(parseInt(item_val[3])<(parseInt($('#qty').val())+parseInt(jml))){
+								$.alert('Jumlah Qty melebihi jumlah Stock.');
+							}else{
+								var h_satuan = clear_f_cur($('#tb_item_paket').find('tbody tr:eq('+ index +') td:eq(4)').html());
+								//alert(h_satuan +'>'+jml+'>'+qty);
+								$('#tb_item_paket').find('tbody tr:eq('+ index +') td:eq(5)').html(parseInt(jml)+parseInt(qty));
+								$('#tb_item_paket').find('tbody tr:eq('+ index +') td:eq(6)').html(f_cur(parseInt(h_satuan)*(parseInt(jml)+parseInt(qty))));
+							}
+						}
 					});
+				}catch(e){
+
+				}finally{
+					
+					var cItem = $('#tb_item_paket').find('tbody tr').length -1;
+					//no = parseInt($('#tb_item_paket').find('tbody tr:eq('+cItem+') td:eq(0)').html());
+
+					
+					
+					if(match==false){
+						//var qty_ttl = $('#tb_item_paket').find('tbody tr td:eq(4)').html();
+					 	$('#tb_item_paket').find('tbody').append(`
+							<tr>
+								<input type="hidden" class="id_item" value="`+ item_val[0] +`">
+								<input type="hidden" class="id_it_paket">
+								<td class="no_item"></td>
+								<td>`+ item_val[1] +`</td>
+								<td>`+ item_val[2] +`</td>
+								<td>`+ item_val[3] +`</td>
+								<td>`+ f_cur(item_val[4]) +`</td>
+								<td>`+ qty +`</td>
+								<td>`+ f_cur((parseInt(qty)*parseInt(item_val[4]))) +`</td>
+								
+								<td>
+									<button onclick="del_item($(this))" type="button" class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete">
+										<span class="glyphicon glyphicon-trash"></span>
+									</button>
+								</td>
+							</tr>
+						`);
+
+						$.each($('#tb_item_paket').find('tbody tr'), function(index, val) {
+							 $('#tb_item_paket').find('tbody tr:eq('+index+') td:eq(0)').html(index+1);
+						});
+					}
+					$('#bc').focus().val('');
+					$('#qty').val('');
+					$('#item_select').prop('selectedIndex',0).select2();
 				}
-				$('#bc').focus().val('');
-				$('#qty').val('');
-				$('#item_select').prop('selectedIndex',0).select2();
+
 			}
 			
 		}else{

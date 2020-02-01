@@ -477,6 +477,24 @@ class Produk extends CI_Controller {
 		}
 	}
 
+	public function add_durasi(){
+		$id_item = $this->input->post('id_item');
+		$name = $this->input->post('name');
+		$harga = $this->input->post('harga');
+
+		$insert = $this->db->insert('durasi',array(
+			'id_item'=>$id_item,
+			'name'=>$name,
+			'harga'=>$harga
+		));
+
+		if($insert){
+			echo 1;
+		}else{
+			echo 0;
+		}
+	}
+
 	public function barang_hilang(){
 		$this->load->model('model_produk');
 		$var['user'] = $_SESSION['user_type'];

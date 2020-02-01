@@ -113,7 +113,7 @@
                                                   $value->qty . '|' .
                                                   $value->harga_jual;
                                         ?>
-                                        <option value="<?php echo $val; ?>"><?php echo $value->nama_item . ' - ' . $value->barcode; ?></option>
+                                        <option value="<?php echo $val; ?>"><?php echo $value->nama_item . ' - ' . $value->barcode; ?> (Stock : <?= $value->qty; ?>)</option>
                                     <?php } ?>
                                   </select>
                                   
