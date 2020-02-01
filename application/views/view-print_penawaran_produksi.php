@@ -102,6 +102,20 @@
               <td class="b r"></td>
               <td class="b l"></td>
             </tr>
+            <?php if($v->jenis_item=='PAKET'){ ?>
+              <?php foreach ($v->isi_paket as $kp => $vp) { ?>
+                <tr>
+                  <td class="b"></td>
+                  <td class="b t"></td>
+                  <td class="b t"></td>
+                  <td class="b">---- <?= $vp->item_name; ?> <b>[<?= $vp->item_qty; ?> <?= $vp->satuan; ?>]</b></td>
+                  <td class="b"></td>
+                  <td class="b r"></td>
+                  <td class="b l"></td>
+                </tr>
+              <?php } ?>
+              
+            <?php } ?>
           <?php } ?>
         <?php } ?>
         <?php $no_kat++; ?>

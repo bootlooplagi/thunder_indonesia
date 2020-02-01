@@ -704,6 +704,7 @@ class Model_produk extends CI_Model {
 												i.harga_jual as item_price,
 												pi.item_qty,
 												i.item_name,
+												i.satuan,
 												i.barcode,
 												i.qty as item_h_stock,
 												i.qty as stock,

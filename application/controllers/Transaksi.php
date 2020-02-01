@@ -1106,6 +1106,7 @@ class Transaksi extends CI_Controller {
 		$this->load->library('m_pdf');
 
 		$this->load->model('model_transaksi');
+		$this->load->model('model_produk');
 
 
         
@@ -1117,6 +1118,10 @@ class Transaksi extends CI_Controller {
 			foreach ($var['r'] as $k => $v) {
 				if($value->id==$v->id_kat){
 					$var['total'][$value->id]+=$v->total_harga;
+				}
+
+				if($v->jenis_item=='PAKET'){
+					$var['r'][$k]->isi_paket = $this->model_produk->list_item_paket($v->id_item);
 				}
 			}
 		}
