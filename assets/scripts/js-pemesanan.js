@@ -196,6 +196,8 @@ function add_item() {
 
 										}).fail();
 									}
+								},cancel:{
+									text:'Batal'
 								}
 							}
 						});
