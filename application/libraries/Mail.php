@@ -70,7 +70,7 @@ class Mail{
         }
     }
 
-    function sendNego($to=null,$toTitle=null,$subject=null,$html=null,$txtBody=null,$attach=null,$attach2=null){
+    function sendNego($to=null,$toTitle=null,$subject=null,$html=null,$txtBody=null,$attach=null,$attach2=null,$attach3=null){
         date_default_timezone_set('Etc/UTC');
 
         require 'mail/PHPMailerAutoload.php';
@@ -95,6 +95,7 @@ class Mail{
         $mail->AltBody = $txtBody;
         $mail->addAttachment($attach);
         $mail->addAttachment($attach2);
+        $mail->addAttachment($attach3);
 
 
 

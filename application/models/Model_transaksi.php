@@ -634,7 +634,6 @@ class Model_transaksi extends CI_Model {
 												i.jenis_item,
 												i.satuan,
 												i.id_sub_kategori,
-												ip.total_harga,
 												ip.harga,
 												ip.disc,
 												ifnull(ip.extra_charge,0) as extra_charge,

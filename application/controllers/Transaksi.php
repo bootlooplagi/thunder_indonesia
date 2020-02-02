@@ -1102,7 +1102,7 @@ class Transaksi extends CI_Controller {
         // }
 	}
 
-	public function cetak_produksi($id=null){
+	public function cetak_produksi($id=null,$type=null){
 		$this->load->library('m_pdf');
 
 		$this->load->model('model_transaksi');
@@ -1158,7 +1158,12 @@ class Transaksi extends CI_Controller {
         
         $pdf->WriteHTML($this->load->view('view-print_penawaran_produksi',$var,TRUE));
 
-        $pdf->Output($pdfFilePath, "I");
+        if(!empty($type)&&$type=='mail'){
+        	$pdf->Output('send_mail/'.$pdfFilePath, "F");
+        	return 'send_mail/'.$pdfFilePath;
+        }else{
+        	$pdf->Output($pdfFilePath, "I");
+        }
 
 
 
@@ -1207,6 +1212,35 @@ class Transaksi extends CI_Controller {
 		// $var['s']='';
   //       $this->load->view('view-print_penawaran_produksi',$var);
 
+	}
+
+	public function cetak_invoice($id=null){
+		$this->load->library('m_pdf');
+
+
+		$this->load->model('model_transaksi');
+		$var['event'] = $this->model_transaksi->list_item_pemesanan($id);
+		$var['kat'] = $this->model_transaksi->katItemPemesanan($id);
+
+		$var['total_harga'] = 0;
+		foreach ($var['event'] as $key => $value) {
+			$var['total_harga']+=(int)$value->total_harga;
+		}
+
+		$html = $this->load->view('view-print_invoice',$var,true);
+
+		$pdfFilePath = "send_mail/".$var['event'][0]->no_pemesanan."_INVOICE-TOTAL.pdf";
+
+        $pdf = $this->m_pdf->load();
+       	// $mpdf = new Mpdf(['format' => 'Legal']);
+
+        $pdf->AddPage('P','','','','','','','','',20,20);
+        
+        
+        $pdf->WriteHTML($html);
+
+        $pdf->Output($pdfFilePath, "F");
+        return $pdfFilePath;
 	}
 
 	public function ck_cus($id_pem=null){
@@ -1407,58 +1441,41 @@ class Transaksi extends CI_Controller {
 		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 		$file = APPPATH.'../assets/doc_penawaran/'.$type.'_'.$list[0]->no_pemesanan.'_'.date('Y-m-d H_i_s').'.xlsx';
 
-		//MPDF ##############################################################
+
+
 		// $this->load->library('m_pdf');
+
         
+		// $var['r']=$this->model_transaksi->list_item_pemesanan($id);
+
+		// $var['ls_tgl'] = $this->db->get_where('tanggal_acara',array('id_pemesanan'=>$id,'is_delete'=>0))->result();
+
+		// $var['ls_tgl_acara'] = [];
+
+		// if(!empty($var['ls_tgl'])){
+		// 	foreach ($var['ls_tgl'] as $key => $value) {
+		// 		array_push($var['ls_tgl_acara'],array(
+		// 			'tanggal_awal'=>date('d M Y',strtotime($value->tanggal_awal)),
+		// 			'tanggal_akhir'=>date('d M Y',strtotime($value->tanggal_akhir))
+		// 		));
+		// 	}
+		// }
+
   //       $css = [];
 
-  //       $pdfFilePath = "INVOICE.pdf";
+  //       $pdfFilePath = "send_mail/INVOICE.pdf";
 
   //       $pdf = $this->m_pdf->load();
-  //      	// $mpdf = new Mpdf(['format' => 'Legal']);
 
   //       $pdf->AddPage('P','','','','','','','','',20,20);
         
-        
-  //       $pdf->WriteHTML('DOKUMEN PRODUKSI');
+  //       $pdf->WriteHTML($this->load->view('view-print_penawaran_produksi',$var,TRUE));
 
   //       $pdf->Output($pdfFilePath, "F");
 
-		$this->load->library('m_pdf');
+        $file2 = $this->cetak_produksi($id,'mail');
 
-		// $this->load->model('model_transaksi');
-        
-		$var['r']=$this->model_transaksi->list_item_pemesanan($id);
-
-		$var['ls_tgl'] = $this->db->get_where('tanggal_acara',array('id_pemesanan'=>$id,'is_delete'=>0))->result();
-
-		$var['ls_tgl_acara'] = [];
-
-		if(!empty($var['ls_tgl'])){
-			foreach ($var['ls_tgl'] as $key => $value) {
-				// echo $value->tanggal_awal;
-				array_push($var['ls_tgl_acara'],array(
-					'tanggal_awal'=>date('d M Y',strtotime($value->tanggal_awal)),
-					'tanggal_akhir'=>date('d M Y',strtotime($value->tanggal_akhir))
-				));
-			}
-		}
-
-        $css = [];
-
-        $pdfFilePath = "INVOICE.pdf";
-
-        $pdf = $this->m_pdf->load();
-       	// $mpdf = new Mpdf(['format' => 'Legal']);
-
-        $pdf->AddPage('P','','','','','','','','',20,20);
-        
-        
-        $pdf->WriteHTML($this->load->view('view-print_penawaran_produksi',$var,TRUE));
-
-        $pdf->Output($pdfFilePath, "F");
-
-        $file2 = "INVOICE.pdf";
+        $file3 = $this->cetak_invoice($id);
         
 		// if (!unlink($file)){
 		// 	echo ("Error deleting $file");
@@ -1482,13 +1499,12 @@ class Transaksi extends CI_Controller {
 		sleep(3);
 		$this->load->library('mail');
 		if($type=='APPROVE'){
-			$mail = $this->mail->sendNego($list[0]->email,$list[0]->nama_pemesan,'APPROVE PENAWARAN','Pemesanan dengan nomor <b>'.$list[0]->no_pemesanan.'</b> telah disetujui.<br>Silahkan download tabel penawaran dibawah untuk melihat rincian biaya.','',$file,$file2);
-
+			$mail = $this->mail->sendNego($list[0]->email,$list[0]->nama_pemesan,'APPROVE PENAWARAN','Pemesanan dengan nomor <b>'.$list[0]->no_pemesanan.'</b> telah disetujui.<br>Silahkan download tabel penawaran dibawah untuk melihat rincian biaya.','',$file,$file2,$file3);
 			return $mail;
 		}
 
 		if($type=='NEGOSIASI'){
-			$mail = $this->mail->sendNego($list[0]->email,$list[0]->nama_pemesan,'NEGOSIASI PENAWARAN','Pemesanan dengan nomor <b>'.$list[0]->no_pemesanan.'</b> telah selesai dinegosiasi.<br>Silahkan download tabel penawaran dibawah untuk melihat rincian biaya. Terimakasih.','',$file,$file2);
+			$mail = $this->mail->sendNego($list[0]->email,$list[0]->nama_pemesan,'NEGOSIASI PENAWARAN','Pemesanan dengan nomor <b>'.$list[0]->no_pemesanan.'</b> telah selesai dinegosiasi.<br>Silahkan download tabel penawaran dibawah untuk melihat rincian biaya. Terimakasih.','',$file,$file2,$file3);
 
 			return $mail;
 		}
