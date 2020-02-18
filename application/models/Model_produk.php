@@ -653,7 +653,7 @@ class Model_produk extends CI_Model {
 	}
 
 	public function tb_item_for_pemesanan(){
-		$query = $this->db->query('select      	i.id as ID_ITEM,
+		$query = $this->db->query("select      	i.id as ID_ITEM,
 												i.is_external,
 									            (select code from pos_kategori where id=i.id_kategori) as code, 
 									            (select id from pos_sub_kategori where id=i.id_sub_kategori) as id_sub,
@@ -679,9 +679,9 @@ class Model_produk extends CI_Model {
 												join user as u
 
 									where       
-													u.id=i.update_by and
-
-									            ((i.jenis_item="ITEM") OR (i.jenis_item="PAKET"))');
+												u.id=i.update_by and
+												i.status='Active' and
+									            ((i.jenis_item='ITEM') OR (i.jenis_item='PAKET'))");
 
 		$err = $this->db->error();
 		if($query){
