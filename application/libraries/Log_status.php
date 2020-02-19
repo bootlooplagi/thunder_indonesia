@@ -14,11 +14,12 @@ class Log_status {
 			$log = array(
 							'id_pemesanan'=>$id_pem,
 							'jenis'=>$type,
-							'status'=>$status,
-							'status_txt'=>$stat[$status]['status'],
+							'status'=>(int)$status,
+							'status_txt'=>$stat[(int)$status]['status'],
 							'insert_by'=>$_SESSION['id_user'],
 							'update_by'=>$_SESSION['id_user']
 						);
+
 			return $log;
 			// echo "HIHI";
 		}
@@ -35,8 +36,8 @@ class Log_status {
 			$log = array(
 							'id_pemesanan'=>$id_pem,
 							'jenis'=>$type,
-							'status'=>$status,
-							'status_txt'=>$stat[$status]['status'],
+							'status'=>(int)$status,
+							'status_txt'=>$stat[(int)$status]['status'],
 							'insert_by'=>$_SESSION['id_user'],
 							'update_by'=>$_SESSION['id_user']
 						);

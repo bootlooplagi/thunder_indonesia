@@ -78,11 +78,14 @@
 
                         <script>arr_cs.push({"id":"<?php echo $value->id_pemesanan; ?>","status":"<?php echo $value->status; ?>"})</script>
                         <?php if($act_button=='pemesanan'){ ?>
+
                             <?php 
-                              $s = $value->status; 
+                              // echo $value->status;
+                              $s = (int)$value->status; 
                               $c = $stat_pemesanan[$s]['color'];
                               $st = $stat_pemesanan[$s]['status'];
                               $id_pem = $value->id_pemesanan;
+
                             ?>
 
                             <tr class="id-<?php echo $value->id_pemesanan; ?>">

@@ -557,15 +557,15 @@ class Transaksi extends CI_Controller {
 		foreach ($ls_item as $key => $val) {
 			if($val->jenis_item=='ITEM' || $val->jenis_item=='PAKET'){
 
-				$jenis = $this->db->select('id,qty,barcode,item_name,jenis_item,is_external')->where('id',$val['id_item'])->get('pos_item');
+				$jenis = $this->db->select('id,qty,barcode,item_name,jenis_item,is_external')->where('id',$val->id_item)->get('pos_item');
 				// print_r($jenis);
 				if($jenis->row()->jenis_item=='ITEM'){
-					$stock_item = $this->db->select('id,qty,barcode,item_name,jenis_item,is_external')->where('id',$val['id_item'])->get('pos_item');
+					$stock_item = $this->db->select('id,qty,barcode,item_name,jenis_item,is_external')->where('id',$val->id_item)->get('pos_item');
 					if(((int)$stock_item->row()->qty<=0 && $stock_item->row()->is_external==0)){
-						array_push($error_message['message'],array('status'=>-1,'message'=>'Stock item <b>'.$val['item_name'].'</b> dengan barcode <b>'.$val['barcode'].'</b> <b style="color:red;">tidak tersedia</b>.'));
+						array_push($error_message['message'],array('status'=>-1,'message'=>'Stock item <b>'.$val->item_name.'</b> dengan barcode <b>'.$val->barcode.'</b> <b style="color:red;">tidak tersedia</b>.'));
 					}else{
-						if((int)$stock_item->row()->qty<$val['qty'] && $stock_item->row()->is_external==0){
-							array_push($error_message['message'],array('status'=>-2,'message'=>'Stock item <b>'.$val['item_name'].'</b> saat ini dengan barcode <b>'.$val['barcode'].'</b> <b style="color:red;">kurang dari jumlah pemesanan</b>.'));
+						if((int)$stock_item->row()->qty<$val->qty && $stock_item->row()->is_external==0){
+							array_push($error_message['message'],array('status'=>-2,'message'=>'Stock item <b>'.$val->item_name.'</b> saat ini dengan barcode <b>'.$val->barcode.'</b> <b style="color:red;">kurang dari jumlah pemesanan</b>.'));
 						}else{
 							$stat++;
 												
@@ -576,7 +576,7 @@ class Transaksi extends CI_Controller {
 				// echo $jenis->row()->jenis_item;
 				if($jenis->row()->jenis_item=='PAKET'){
 					$stat_item = 0;
-					$id_paket = $this->db->select('id,qty,barcode,item_name,jenis_item')->where('id',$val['id_item'])->get('pos_item');
+					$id_paket = $this->db->select('id,qty,barcode,item_name,jenis_item')->where('id',$val->id_item)->get('pos_item');
 					
 					$this->load->model('Model_produk');
 					$ls_item_paket = json_decode(json_encode($this->Model_produk->list_item_paket($id_paket->row()->id)),true);
@@ -586,10 +586,10 @@ class Transaksi extends CI_Controller {
 
 						//print_r($val_item_paket);
 						if((int)$val_item_paket['stock']<=0){
-							array_push($error_message['message'],array('status'=>-1,'message'=>'Stock item <b>'.$val_item_paket['item_name'].'</b> dengan barcode <b>'.$val_item_paket['barcode'].'</b> pada Paket "'.$val['item_name'].'" <b style="color:red;">tidak tersedia</b>.'));
+							array_push($error_message['message'],array('status'=>-1,'message'=>'Stock item <b>'.$val_item_paket['item_name'].'</b> dengan barcode <b>'.$val_item_paket['barcode'].'</b> pada Paket "'.$val->item_name.'" <b style="color:red;">tidak tersedia</b>.'));
 						}else{
-							if((int)$val_item_paket['stock']<($val_item_paket['item_qty']*(int)$val['qty'])){
-								array_push($error_message['message'],array('status'=>-2,'message'=>'Stock item <b>'.$val_item_paket['item_name'].'</b> saat ini dengan barcode <b>'.$val_item_paket['barcode'].'</b> pada Paket "'.$val['item_name'].'" <b style="color:red;">kurang dari jumlah pemesanan</b>.'));
+							if((int)$val_item_paket['stock']<($val_item_paket['item_qty']*(int)$val->qty)){
+								array_push($error_message['message'],array('status'=>-2,'message'=>'Stock item <b>'.$val_item_paket['item_name'].'</b> saat ini dengan barcode <b>'.$val_item_paket['barcode'].'</b> pada Paket "'.$val->item_name.'" <b style="color:red;">kurang dari jumlah pemesanan</b>.'));
 							}else{
 								// echo "SUK";
 								$stat_item++;
@@ -648,7 +648,7 @@ class Transaksi extends CI_Controller {
 				$act = $this->db->update('pemesanan',$data);
 
 				if($act){
-					echo json_encode(array('status'=>'success','message'=>'Sukses Mengubah Data'));
+					// echo json_encode(array('status'=>'success','message'=>'Sukses Mengubah Data'));
 
 					$this->load->library('log_status');
 					$jenis_pemesanan = $this->db->where('id',$id)->select('jenis')->get('pemesanan');
@@ -946,6 +946,7 @@ class Transaksi extends CI_Controller {
 
 			$log = $this->log_status->add_log($id_pem,$stat,$jenis_pemesanan->row()->jenis);
 			$this->db->insert('log_status_pemesanan',$log);
+			// print_r($log);
 		}else{
 			$status = $st[0];
 			$messageStat = $msg[2];
@@ -1517,6 +1518,25 @@ class Transaksi extends CI_Controller {
 		$remark = $_POST['remark'];
 
 		$this->db->where('id',$id)->update('item_pemesanan',array('is_out'=>$status,'out_date'=>date('Y-m-d H:i:s'),'out_remark'=>$remark));
+
+		$getItem = $this->db->select('id_item,qty')->get_where('item_pemesanan',array('id'=>$id));
+		if($getItem->num_rows()>0){
+
+			$item = $this->db->select('qty')->get_where('pos_item',array('id'=>$getItem->row()->id_item));
+			if($item->num_rows()>0){
+				if($status==0){
+					$qty = (int)$item->row()->qty+$getItem->row()->qty;
+					$setItem = $this->db->where('id',$getItem->row()->id_item)->update('pos_item',array('qty'=>$qty));
+				}
+
+				if($status==1){
+					$qty = (int)$item->row()->qty-$getItem->row()->qty;
+					$setItem = $this->db->where('id',$getItem->row()->id_item)->update('pos_item',array('qty'=>$qty));
+				}
+				// 
+			}
+		}
+
 	}
 
 	public function chk_list_in(){
@@ -1525,6 +1545,24 @@ class Transaksi extends CI_Controller {
 		$remark = $_POST['remark'];
 
 		$this->db->where('id',$id)->update('item_pemesanan',array('is_in'=>$status,'in_date'=>date('Y-m-d H:i:s'),'in_remark'=>$remark));
+
+		$getItem = $this->db->select('id_item,qty')->get_where('item_pemesanan',array('id'=>$id));
+		if($getItem->num_rows()>0){
+
+			$item = $this->db->select('qty')->get_where('pos_item',array('id'=>$getItem->row()->id_item));
+			if($item->num_rows()>0){
+				if($status==0){
+					$qty = (int)$item->row()->qty-$getItem->row()->qty;
+					$setItem = $this->db->where('id',$getItem->row()->id_item)->update('pos_item',array('qty'=>$qty));
+				}
+
+				if($status==1){
+					$qty = (int)$item->row()->qty+$getItem->row()->qty;
+					$setItem = $this->db->where('id',$getItem->row()->id_item)->update('pos_item',array('qty'=>$qty));
+				}
+				// 
+			}
+		}
 	}
 
 	public function getRemarkOut(){
