@@ -557,6 +557,7 @@
                                             <td colspan="2">
                                               
                                               <select <?php echo nego(); ?> style="width:100%;" class="select2 act" id="item_select" onchange="ch_select($(this).val())">
+                                                <option disabled="disabled" selected="selected">-- Pilih Item --</option>
                                                 <?php if(!array_key_exists('status', $items)){?>
                                                     <?php foreach ($items as $key => $value) { ?>
                                                       <?php 
@@ -595,13 +596,14 @@
                                                 </select>
                                             </td>
                                             <td>
+                                                <span id="load_sel_durasi" class="fa fa-spinner fa-spin" style="font-size: 20px; display: none;"></span>
                                                 <select style="width:100%;" <?php echo nego(); ?> class="form-control" id="sel_durasi" ></select>
                                             </td>
                                             <td>
                                                 
                                             </td>
                                             <td class="all">
-                                                <button <?php echo nego(); ?> id="btn_add" onclick="add_item(); " type="button" class="btn btn-success btn-sm col-xs-12" data-toggle="tooltip" title="Add Item"><span class="glyphicon glyphicon-plus"></span></button>
+                                                <button disabled="disabled" <?php echo nego(); ?> id="btn_add" onclick="add_item(); " type="button" class="btn btn-success btn-sm col-xs-12" data-toggle="tooltip" title="Add Item"><span class="glyphicon glyphicon-plus"></span></button>
                                             </td>
                                             <td style="display: none"></td>
                                             <td style="display: none"></td>

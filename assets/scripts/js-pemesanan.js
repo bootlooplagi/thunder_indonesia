@@ -1353,6 +1353,10 @@ function conf_to_prod(x){
 var is_durasi = 0;
 
 function ch_select(x){
+	// $('#btn_add').prop('disabled',true);
+	$('#sel_durasi').hide();
+	$('#load_sel_durasi').show();
+
 	var v = x.split("|");
 	$('#bc').val(v[1]); 
 	setTimeout(function(){
@@ -1367,6 +1371,9 @@ function ch_select(x){
 		if(response=='null'){
 			is_durasi = 0;
 			res = [];
+			$('#sel_durasi').show();
+			$('#load_sel_durasi').hide();
+
 			// $('#sel_durasi').append(`<option>-- Pilih Durasi --</option>`);
 			// $('#sel_durasi').append(`<option>--- Tambah Durasi? ---</option>`);
 		}else{
@@ -1376,6 +1383,8 @@ function ch_select(x){
 			res.forEach(function(item,index){
 				$('#sel_durasi').append(`<option value="`+item.id+`|`+item.harga+`|`+item.name+`">`+item.name+` - Rp `+f_cur(item.harga)+`</option>`);
 			});
+			$('#sel_durasi').show();
+			$('#load_sel_durasi').hide();
 		}
 		
 		
