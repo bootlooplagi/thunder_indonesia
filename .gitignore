@@ -10,4 +10,4 @@ application/config/
 *.pdf
 *.xlsx
 
-application/third_party/mpdf60/examples/
+application/third_party/mpdf60/

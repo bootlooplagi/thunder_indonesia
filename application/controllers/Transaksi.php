@@ -657,6 +657,8 @@ class Transaksi extends CI_Controller {
 					$this->db->insert('log_status_pemesanan',$log);
 
 					$this->ch_stat_from_admin($id,5);
+
+
 				}else{
 					echo json_encode(array('status'=>'error','message'=>array(0=>array('status'=>'error','message'=>'Error DB. Err Code (7676)'))));
 				}
@@ -886,9 +888,15 @@ class Transaksi extends CI_Controller {
 
 	}
 
-	public function ch_stat_from_admin(){
+	public function ch_stat_from_admin($id_=null,$status_=null){
 		$id_pem = $this->input->post('id');
 		$stat = $this->input->post('stat');
+
+		if(!empty($id_)&&!empty($status_)){
+			$id_pem = $id_;
+			$stat = $status_;
+		}
+		
 		//KIRIM EMAIL
 		//$id_pem = $this->input->post('id_pem');
 		$data = array(
